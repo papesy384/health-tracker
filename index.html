@@ -426,22 +426,30 @@
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-target card-icon"></i>
-                    <h3 class="card-title">Weight Goal Tracking</h3>
+                    <h3 class="card-title">Automatic Weight Goal Tracking</h3>
+                </div>
+                
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+                    <h4 style="color: #2d5a2d; margin-bottom: 10px;"><i class="fas fa-magic"></i> Smart Goal Generation</h4>
+                    <p style="color: #2d5a2d; margin: 0; font-size: 0.9rem;">
+                        Healthy weight goals are automatically calculated based on your BMI and height. 
+                        Goals are set to achieve optimal health ranges.
+                    </p>
                 </div>
                 
                 <div class="input-group">
-                    <label for="weightGoal">Weekly Weight Goal</label>
+                    <label for="weightGoal">Generated Weight Goal</label>
                     <div class="input-row">
-                        <input type="number" id="weightGoal" placeholder="Target weight" step="0.1">
-                        <select id="goalUnit">
+                        <input type="number" id="weightGoal" placeholder="Will be set automatically" step="0.1" readonly style="background: #f8f9fa;">
+                        <select id="goalUnit" disabled style="background: #f8f9fa;">
                             <option value="kg">kg</option>
                             <option value="lbs">lbs</option>
                         </select>
                     </div>
                 </div>
 
-                <button class="btn btn-secondary" onclick="setWeightGoal()">
-                    <i class="fas fa-save"></i> Set Goal
+                <button class="btn btn-secondary" onclick="setWeightGoal()" disabled style="opacity: 0.6;">
+                    <i class="fas fa-save"></i> Auto-Generated Goal
                 </button>
 
                 <div class="goal-comparison" id="goalComparison" style="display: none;">
@@ -630,6 +638,61 @@
             return recommendations;
         }
 
+        // Generate Healthy Weight Goal based on BMI and current weight
+        function generateHealthyWeightGoal(bmi, currentWeight, weightUnit, height, heightUnit) {
+            let heightM = height;
+            let currentWeightKg = currentWeight;
+            
+            // Convert to metric for calculations
+            if (heightUnit === 'in') {
+                heightM = height * 0.0254;
+            } else if (heightUnit === 'cm') {
+                heightM = height / 100;
+            }
+            
+            if (weightUnit === 'lbs') {
+                currentWeightKg = currentWeight * 0.453592;
+            }
+            
+            let targetBMI;
+            let goalReason;
+            
+            if (bmi < 18.5) {
+                // Underweight - aim for lower end of normal range
+                targetBMI = 20.0;
+                goalReason = "Gain weight to reach healthy BMI range";
+            } else if (bmi >= 18.5 && bmi < 25) {
+                // Normal weight - maintain current range
+                targetBMI = bmi; // Keep current BMI
+                goalReason = "Maintain current healthy weight";
+            } else if (bmi >= 25 && bmi < 30) {
+                // Overweight - aim for upper end of normal range
+                targetBMI = 24.0;
+                goalReason = "Lose weight to reach healthy BMI range";
+            } else {
+                // Obese - aim for lower end of normal range
+                targetBMI = 22.0;
+                goalReason = "Lose weight to reach healthy BMI range";
+            }
+            
+            // Calculate target weight in kg
+            const targetWeightKg = targetBMI * (heightM * heightM);
+            
+            // Convert back to user's preferred unit
+            let targetWeight = targetWeightKg;
+            if (weightUnit === 'lbs') {
+                targetWeight = targetWeightKg * 2.20462;
+            }
+            
+            return {
+                weight: Math.round(targetWeight * 10) / 10, // Round to 1 decimal place
+                unit: weightUnit,
+                bmi: targetBMI,
+                reason: goalReason,
+                isMaintenance: bmi >= 18.5 && bmi < 25
+            };
+        }
+
         // Trigger Weekly Workflow
         function triggerWorkflow() {
             const weight = parseFloat(document.getElementById('weight').value);
@@ -680,17 +743,34 @@
             document.getElementById('recommendations').style.display = 'block';
             document.getElementById('noDataMessage').style.display = 'none';
             
-            // Update goal comparison if goal is set
-            if (userData.weightGoal) {
-                updateGoalComparison();
-            }
+            // Automatically generate healthy weight goal
+            const healthyGoal = generateHealthyWeightGoal(bmi, weight, weightUnit, height, heightUnit);
+            userData.weightGoal = {
+                value: healthyGoal.weight,
+                unit: healthyGoal.unit,
+                reason: healthyGoal.reason,
+                targetBMI: healthyGoal.bmi,
+                isMaintenance: healthyGoal.isMaintenance
+            };
+            
+            // Update goal display
+            updateGoalComparison();
+            
+            // Update goal input fields to show the generated goal
+            document.getElementById('weightGoal').value = healthyGoal.weight;
+            document.getElementById('goalUnit').value = healthyGoal.unit;
             
             // Simulate email delivery
             setTimeout(() => {
+                const goalMessage = healthyGoal.isMaintenance ? 
+                    `Maintain current weight: ${healthyGoal.weight} ${healthyGoal.unit}` :
+                    `Target weight: ${healthyGoal.weight} ${healthyGoal.unit} (${healthyGoal.reason})`;
+                
                 alert('✅ Weekly recommendations have been sent to your email!\n\n' +
                       `BMI: ${bmi.toFixed(1)} (${bmiCategory})\n` +
                       `Diet recommendations: ${dietRecs.length} items\n` +
-                      `Sleep recommendations: ${sleepRecs.length} items`);
+                      `Sleep recommendations: ${sleepRecs.length} items\n` +
+                      `Weight goal: ${goalMessage}`);
             }, 1000);
             
             // Log workflow execution
@@ -727,6 +807,9 @@
             const targetWeight = userData.weightGoal.value;
             const currentUnit = document.getElementById('weightUnit').value;
             const targetUnit = userData.weightGoal.unit;
+            const goalReason = userData.weightGoal.reason;
+            const targetBMI = userData.weightGoal.targetBMI;
+            const isMaintenance = userData.weightGoal.isMaintenance;
             
             // Convert to same unit for comparison
             let currentDisplay = currentWeight;
@@ -741,14 +824,32 @@
             }
             
             const difference = currentDisplay - targetDisplay;
-            const progress = difference > 0 ? 
-                `${difference.toFixed(1)} ${currentUnit} to lose` : 
-                `${Math.abs(difference).toFixed(1)} ${currentUnit} to gain`;
+            let progress;
+            
+            if (isMaintenance) {
+                progress = `Maintain current healthy weight (BMI: ${targetBMI.toFixed(1)})`;
+            } else {
+                progress = difference > 0 ? 
+                    `${difference.toFixed(1)} ${currentUnit} to lose` : 
+                    `${Math.abs(difference).toFixed(1)} ${currentUnit} to gain`;
+            }
             
             document.getElementById('currentWeight').textContent = `${currentWeight} ${currentUnit}`;
             document.getElementById('targetWeight').textContent = `${targetWeight} ${targetUnit}`;
             document.getElementById('weightProgress').textContent = progress;
-            document.getElementById('goalComparison').style.display = 'block';
+            
+            // Add goal reason to the display
+            const goalComparisonDiv = document.getElementById('goalComparison');
+            let reasonElement = document.getElementById('goalReason');
+            if (!reasonElement) {
+                reasonElement = document.createElement('div');
+                reasonElement.id = 'goalReason';
+                reasonElement.style.cssText = 'margin-top: 10px; padding: 10px; background: #e8f5e8; border-radius: 5px; font-size: 0.9rem; color: #2d5a2d;';
+                goalComparisonDiv.appendChild(reasonElement);
+            }
+            reasonElement.innerHTML = `<strong>Goal Reason:</strong> ${goalReason}<br><strong>Target BMI:</strong> ${targetBMI.toFixed(1)}`;
+            
+            goalComparisonDiv.style.display = 'block';
         }
 
         // Test Email Delivery
