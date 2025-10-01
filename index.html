@@ -135,6 +135,10 @@
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
         }
 
+        .btn-test {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+        }
+
         .results {
             background: white;
             border-radius: 15px;
@@ -263,6 +267,16 @@
             margin-bottom: 10px;
         }
 
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -346,6 +360,7 @@
             <button class="btn" onclick="generateRecommendations()">Generate Health Plan</button>
             <button class="btn btn-secondary" onclick="sendEmailReport()">Send Email Report</button>
             <button class="btn btn-tertiary" onclick="openEmailClient()">Open Email Client</button>
+            <button class="btn btn-test" onclick="testEmailFunction()">Test Email Function</button>
         </div>
 
         <div class="results" id="results">
@@ -376,6 +391,11 @@
                 <button class="btn btn-secondary" onclick="sendEmailReport()">Send to My Email</button>
                 <button class="btn btn-tertiary" onclick="openEmailClient()">Open Email Client</button>
                 <button class="btn" onclick="copyToClipboard()">Copy Report to Clipboard</button>
+            </div>
+
+            <div class="debug-info" id="debugInfo" style="display: none;">
+                <h4>Debug Information</h4>
+                <div id="debugContent"></div>
             </div>
         </div>
     </div>
@@ -451,6 +471,180 @@
             }
         }
 
+        // Test email function
+        function testEmailFunction() {
+            console.log('🧪 Testing email function...');
+            
+            // Check if we have current report
+            if (!currentReport) {
+                alert('Please generate a health plan first, then test the email function');
+                return;
+            }
+            
+            // Check if we have email
+            if (!userData.email) {
+                alert('Please enter your email address first');
+                return;
+            }
+            
+            // Show debug info
+            const debugContent = `
+                Email: ${userData.email}
+                Current Report: ${currentReport ? 'Available' : 'Not Available'}
+                BMI: ${currentReport ? currentReport.bmi : 'N/A'}
+                Browser: ${navigator.userAgent}
+                Mailto Support: ${navigator.userAgent.includes('Chrome') ? 'Yes' : 'Unknown'}
+            `;
+            
+            document.getElementById('debugContent').innerHTML = debugContent.replace(/\n/g, '<br>');
+            document.getElementById('debugInfo').style.display = 'block';
+            
+            // Test the actual email function
+            sendEmailReport();
+        }
+
+        // Send email report (FIXED VERSION)
+        function sendEmailReport() {
+            console.log('📧 sendEmailReport called');
+            
+            // Check if we have current report
+            if (!currentReport) {
+                alert('Please generate a health plan first');
+                return;
+            }
+            
+            // Check if we have email
+            if (!userData.email) {
+                alert('Please enter your email address first');
+                return;
+            }
+            
+            console.log('📧 Preparing email for:', userData.email);
+            
+            const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
+            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
+            
+            // Create mailto link
+            const subject = encodeURIComponent(`Health Report - ${new Date().toLocaleDateString()}`);
+            const body = encodeURIComponent(emailContent);
+            const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
+            
+            console.log('📧 Mailto link:', mailtoLink);
+            
+            // Try to open email client
+            try {
+                // Use window.location.href instead of window.open for better compatibility
+                window.location.href = mailtoLink;
+                showNotification('📧 Email client opened with your health report!');
+            } catch (error) {
+                console.error('📧 Error opening email client:', error);
+                // Fallback: copy to clipboard
+                copyToClipboard();
+                showNotification('📋 Health report copied to clipboard! Paste it into your email.');
+            }
+        }
+
+        // Open email client with pre-filled content
+        function openEmailClient() {
+            console.log('📧 openEmailClient called');
+            
+            if (!currentReport) {
+                alert('Please generate a health plan first');
+                return;
+            }
+
+            const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
+            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
+            
+            const subject = encodeURIComponent(`Health Report - ${new Date().toLocaleDateString()}`);
+            const body = encodeURIComponent(emailContent);
+            const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+            
+            console.log('📧 Generic mailto link:', mailtoLink);
+            
+            try {
+                window.location.href = mailtoLink;
+                showNotification('📧 Email client opened with your health report!');
+            } catch (error) {
+                console.error('📧 Error opening email client:', error);
+                // Fallback: copy to clipboard
+                copyToClipboard();
+                showNotification('📋 Health report copied to clipboard! Paste it into your email.');
+            }
+        }
+
+        // Copy report to clipboard
+        function copyToClipboard() {
+            console.log('📋 copyToClipboard called');
+            
+            if (!currentReport) {
+                alert('Please generate a health plan first');
+                return;
+            }
+
+            const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
+            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
+            
+            navigator.clipboard.writeText(emailContent).then(() => {
+                showNotification('📋 Health report copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = emailContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('📋 Health report copied to clipboard!');
+            });
+        }
+
+        // Generate email content
+        function generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan) {
+            return `
+Health Report - ${new Date().toLocaleDateString()}
+
+BMI: ${bmi.toFixed(1)} (${bmiCategory})
+
+Diet Recommendations:
+${dietRecs.map(rec => `• ${rec}`).join('\n')}
+
+Sleep Recommendations:
+${sleepRecs.map(rec => `• ${rec}`).join('\n')}
+
+Comprehensive Meal Plan:
+Breakfast Options: ${mealPlan.breakfast.join(', ')}
+Lunch Options: ${mealPlan.lunch.join(', ')}
+Dinner Options: ${mealPlan.dinner.join(', ')}
+Snack Options: ${mealPlan.snacks.join(', ')}
+
+Generated by Health Workflow Automation
+            `.trim();
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                font-weight: 500;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
         // Check if it's time for weekly automation
         function isTimeForWeeklyAutomation() {
             const now = new Date();
@@ -485,124 +679,11 @@
             const mealPlan = generateComprehensiveMealPlan(bmi, userData.weightGoal, userData.weight);
             
             // Send automated email
-            sendEmailReport(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
+            sendEmailReport();
             
             // Update last run time
             userData.lastWorkflowRun = new Date().toISOString();
             saveUserData();
-        }
-
-        // Send email report (multiple methods)
-        function sendEmailReport(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan) {
-            if (!userData.email) {
-                alert('Please enter your email address first');
-                return;
-            }
-
-            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
-            
-            // Method 1: Try to send via mailto (opens default email client)
-            const subject = encodeURIComponent(`Health Report - ${new Date().toLocaleDateString()}`);
-            const body = encodeURIComponent(emailContent);
-            const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
-            
-            // Try to open email client
-            try {
-                window.open(mailtoLink);
-                showNotification('📧 Email client opened with your health report!');
-            } catch (error) {
-                // Method 2: Copy to clipboard as fallback
-                copyToClipboard();
-                showNotification('📋 Health report copied to clipboard! Paste it into your email.');
-            }
-        }
-
-        // Generate email content
-        function generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan) {
-            return `
-Health Report - ${new Date().toLocaleDateString()}
-
-BMI: ${bmi.toFixed(1)} (${bmiCategory})
-
-Diet Recommendations:
-${dietRecs.map(rec => `• ${rec}`).join('\n')}
-
-Sleep Recommendations:
-${sleepRecs.map(rec => `• ${rec}`).join('\n')}
-
-Comprehensive Meal Plan:
-Breakfast Options: ${mealPlan.breakfast.join(', ')}
-Lunch Options: ${mealPlan.lunch.join(', ')}
-Dinner Options: ${mealPlan.dinner.join(', ')}
-Snack Options: ${mealPlan.snacks.join(', ')}
-
-Generated by Health Workflow Automation
-            `.trim();
-        }
-
-        // Open email client with pre-filled content
-        function openEmailClient() {
-            if (!currentReport) {
-                alert('Please generate a health plan first');
-                return;
-            }
-
-            const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
-            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
-            
-            const subject = encodeURIComponent(`Health Report - ${new Date().toLocaleDateString()}`);
-            const body = encodeURIComponent(emailContent);
-            const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
-            
-            window.open(mailtoLink);
-            showNotification('📧 Email client opened with your health report!');
-        }
-
-        // Copy report to clipboard
-        function copyToClipboard() {
-            if (!currentReport) {
-                alert('Please generate a health plan first');
-                return;
-            }
-
-            const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
-            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
-            
-            navigator.clipboard.writeText(emailContent).then(() => {
-                showNotification('📋 Health report copied to clipboard!');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = emailContent;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showNotification('📋 Health report copied to clipboard!');
-            });
-        }
-
-        // Show notification
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #28a745;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 1000;
-                font-weight: 500;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 5000);
         }
 
         // Check for automation every minute
