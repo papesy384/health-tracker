@@ -132,10 +132,6 @@
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
 
-        .btn-tertiary {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-        }
-
         .btn-loading {
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             cursor: not-allowed;
@@ -357,7 +353,6 @@
 
             <button class="btn" onclick="generateRecommendations()">Generate Health Plan</button>
             <button class="btn btn-secondary" onclick="sendEmailAutomatically()" id="sendEmailBtn">Send Email Automatically</button>
-            <button class="btn btn-tertiary" onclick="testEmailServices()">Test Email Services</button>
         </div>
 
         <div class="results" id="results">
@@ -618,27 +613,6 @@
             } catch (error) {
                 console.error('📧 Netlify Forms failed:', error);
                 return false;
-            }
-        }
-
-        // Test email services
-        async function testEmailServices() {
-            console.log('🧪 Testing email services...');
-            
-            if (!userData.email) {
-                alert('Please enter your email address first');
-                return;
-            }
-            
-            setEmailStatus('loading', 'Testing email services...');
-            
-            const testContent = `Test email from Health Workflow Automation - ${new Date().toLocaleString()}`;
-            const emailSent = await tryEmailServices(userData.email, testContent);
-            
-            if (emailSent) {
-                setEmailStatus('success', '✅ Test email sent successfully! Check your inbox.');
-            } else {
-                setEmailStatus('error', '❌ All email services failed. Please check configuration.');
             }
         }
 
