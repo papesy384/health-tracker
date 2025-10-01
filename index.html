@@ -543,31 +543,36 @@
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-target card-icon"></i>
-                    <h3 class="card-title">Automatic Weight Goal Tracking</h3>
+                    <h3 class="card-title">Flexible Weight Goal Tracking</h3>
                 </div>
                 
                 <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
-                    <h4 style="color: #2d5a2d; margin-bottom: 10px;"><i class="fas fa-magic"></i> Smart Goal Generation</h4>
+                    <h4 style="color: #2d5a2d; margin-bottom: 10px;"><i class="fas fa-magic"></i> Flexible Goal Setting</h4>
                     <p style="color: #2d5a2d; margin: 0; font-size: 0.9rem;">
-                        Healthy weight goals are automatically calculated based on your BMI and height. 
-                        Goals are set to achieve optimal health ranges.
+                        Set your own custom weight goal or use our smart BMI-based recommendation. 
+                        Both options will generate personalized meal plans and realistic timelines.
                     </p>
                 </div>
                 
                 <div class="input-group">
-                    <label for="weightGoal">Generated Weight Goal</label>
+                    <label for="weightGoal">Custom Weight Goal (Optional)</label>
                     <div class="input-row">
-                        <input type="number" id="weightGoal" placeholder="Will be set automatically" step="0.1" readonly style="background: #f8f9fa;">
-                        <select id="goalUnit" disabled style="background: #f8f9fa;">
+                        <input type="number" id="weightGoal" placeholder="Enter custom target weight" step="0.1">
+                        <select id="goalUnit">
                             <option value="kg">kg</option>
                             <option value="lbs">lbs</option>
                         </select>
                     </div>
                 </div>
 
-                <button class="btn btn-secondary" onclick="setWeightGoal()" disabled style="opacity: 0.6;">
-                    <i class="fas fa-save"></i> Auto-Generated Goal
-                </button>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="setCustomWeightGoal()" style="flex: 1;">
+                        <i class="fas fa-save"></i> Set Custom Goal
+                    </button>
+                    <button class="btn btn-success" onclick="useAutoWeightGoal()" style="flex: 1;">
+                        <i class="fas fa-magic"></i> Use Auto Goal
+                    </button>
+                </div>
 
                 <div class="goal-comparison" id="goalComparison" style="display: none;">
                     <div class="metric">
@@ -1027,7 +1032,8 @@
                 unit: healthyGoal.unit,
                 reason: healthyGoal.reason,
                 targetBMI: healthyGoal.bmi,
-                isMaintenance: healthyGoal.isMaintenance
+                isMaintenance: healthyGoal.isMaintenance,
+                isCustom: false
             };
             
             // Generate personalized meal plan
@@ -1091,8 +1097,8 @@
             });
         }
 
-        // Set Weight Goal
-        function setWeightGoal() {
+        // Set Custom Weight Goal
+        function setCustomWeightGoal() {
             const goal = parseFloat(document.getElementById('weightGoal').value);
             const unit = document.getElementById('goalUnit').value;
             
@@ -1101,10 +1107,118 @@
                 return;
             }
             
-            userData.weightGoal = { value: goal, unit: unit };
-            updateGoalComparison();
+            if (!userData.weight) {
+                alert('Please enter your current weight first by running the weekly workflow');
+                return;
+            }
             
-            alert(`Weight goal set: ${goal} ${unit}`);
+            // Calculate BMI for the custom goal to determine if it's reasonable
+            const currentWeight = userData.weight;
+            const height = userData.height;
+            const heightUnit = document.getElementById('heightUnit').value;
+            const weightUnit = document.getElementById('weightUnit').value;
+            
+            // Convert to metric for BMI calculation
+            let heightM = height;
+            let goalKg = goal;
+            let currentWeightKg = currentWeight;
+            
+            if (heightUnit === 'in') {
+                heightM = height * 0.0254;
+            } else if (heightUnit === 'cm') {
+                heightM = height / 100;
+            }
+            
+            if (unit === 'lbs') {
+                goalKg = goal * 0.453592;
+            }
+            if (weightUnit === 'lbs') {
+                currentWeightKg = currentWeight * 0.453592;
+            }
+            
+            const goalBMI = goalKg / (heightM * heightM);
+            
+            // Check if goal BMI is within reasonable range
+            if (goalBMI < 16 || goalBMI > 40) {
+                const confirmUnusual = confirm(
+                    `Warning: This goal would result in a BMI of ${goalBMI.toFixed(1)}, which is outside the typical healthy range (18.5-24.9).\n\n` +
+                    `Are you sure you want to set this goal? Consider consulting a healthcare provider.`
+                );
+                if (!confirmUnusual) {
+                    return;
+                }
+            }
+            
+            userData.weightGoal = { 
+                value: goal, 
+                unit: unit,
+                reason: "Custom user-defined goal",
+                targetBMI: goalBMI,
+                isMaintenance: false,
+                isCustom: true
+            };
+            
+            // Generate new meal plan and timeline based on custom goal
+            if (userData.weight && userData.height && userData.sleepHours) {
+                const bmi = calculateBMI(userData.weight, userData.height, weightUnit, heightUnit);
+                const mealPlan = generatePersonalizedMealPlan(bmi, userData.sleepHours, userData.weightGoal, userData.weight);
+                const timeline = calculateWeightTimeline(userData.weight, goal, unit);
+                
+                userData.mealPlan = mealPlan;
+                userData.timeline = timeline;
+                
+                // Update displays
+                updateGoalComparison();
+                displayMealPlan();
+            }
+            
+            alert(`Custom weight goal set: ${goal} ${unit} (BMI: ${goalBMI.toFixed(1)})`);
+        }
+
+        // Use Auto-Generated Weight Goal
+        function useAutoWeightGoal() {
+            if (!userData.weight || !userData.height) {
+                alert('Please enter your weight and height first by running the weekly workflow');
+                return;
+            }
+            
+            const weight = userData.weight;
+            const height = userData.height;
+            const weightUnit = document.getElementById('weightUnit').value;
+            const heightUnit = document.getElementById('heightUnit').value;
+            
+            // Generate automatic goal
+            const bmi = calculateBMI(weight, height, weightUnit, heightUnit);
+            const healthyGoal = generateHealthyWeightGoal(bmi, weight, weightUnit, height, heightUnit);
+            
+            // Set the goal
+            userData.weightGoal = {
+                value: healthyGoal.weight,
+                unit: healthyGoal.unit,
+                reason: healthyGoal.reason,
+                targetBMI: healthyGoal.bmi,
+                isMaintenance: healthyGoal.isMaintenance,
+                isCustom: false
+            };
+            
+            // Update input fields
+            document.getElementById('weightGoal').value = healthyGoal.weight;
+            document.getElementById('goalUnit').value = healthyGoal.unit;
+            
+            // Generate new meal plan and timeline
+            if (userData.sleepHours) {
+                const mealPlan = generatePersonalizedMealPlan(bmi, userData.sleepHours, userData.weightGoal, weight);
+                const timeline = calculateWeightTimeline(weight, healthyGoal.weight, weightUnit);
+                
+                userData.mealPlan = mealPlan;
+                userData.timeline = timeline;
+                
+                // Update displays
+                updateGoalComparison();
+                displayMealPlan();
+            }
+            
+            alert(`Auto-generated weight goal set: ${healthyGoal.weight} ${healthyGoal.unit} (BMI: ${healthyGoal.bmi.toFixed(1)})`);
         }
 
         // Update Goal Comparison
@@ -1155,7 +1269,8 @@
                 reasonElement.style.cssText = 'margin-top: 10px; padding: 10px; background: #e8f5e8; border-radius: 5px; font-size: 0.9rem; color: #2d5a2d;';
                 goalComparisonDiv.appendChild(reasonElement);
             }
-            reasonElement.innerHTML = `<strong>Goal Reason:</strong> ${goalReason}<br><strong>Target BMI:</strong> ${targetBMI.toFixed(1)}`;
+            const goalType = userData.weightGoal.isCustom ? 'Custom Goal' : 'Auto-Generated Goal';
+            reasonElement.innerHTML = `<strong>Goal Type:</strong> ${goalType}<br><strong>Goal Reason:</strong> ${goalReason}<br><strong>Target BMI:</strong> ${targetBMI.toFixed(1)}`;
             
             goalComparisonDiv.style.display = 'block';
             
