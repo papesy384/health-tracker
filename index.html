@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Tracker</title>
+    <title>Health Workflow Automation</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -36,6 +36,26 @@
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
+
+        .automation-status {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active { background: #4CAF50; }
+        .status-inactive { background: #f44336; }
 
         .form {
             background: white;
@@ -77,6 +97,18 @@
             border-color: #667eea;
         }
 
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
         .btn {
             width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -88,11 +120,15 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s ease;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
 
         .results {
@@ -228,7 +264,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-heartbeat"></i> Health Tracker</h1>
+            <h1><i class="fas fa-cogs"></i> Health Workflow Automation</h1>
+        </div>
+
+        <div class="automation-status">
+            <span class="status-indicator status-inactive" id="statusIndicator"></span>
+            <strong>Automation Status:</strong> <span id="statusText">Inactive</span>
         </div>
 
         <div class="form">
@@ -275,7 +316,18 @@
                 </div>
             </div>
 
+            <div class="input-group">
+                <label for="email">Email (for automated reports)</label>
+                <input type="email" id="email" placeholder="your@email.com">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="automationEnabled" onchange="toggleAutomation()">
+                <label for="automationEnabled">Enable Weekly Automation (Sundays at 9 AM)</label>
+            </div>
+
             <button class="btn" onclick="generateRecommendations()">Generate Health Plan</button>
+            <button class="btn btn-secondary" onclick="testAutomation()">Test Automation</button>
         </div>
 
         <div class="results" id="results">
@@ -303,7 +355,7 @@
     </div>
 
     <script>
-        // Health Tracker JavaScript
+        // Health Workflow Automation JavaScript
         
         // Global state
         let userData = {
@@ -311,8 +363,184 @@
             height: null,
             sleepHours: null,
             exerciseMinutes: null,
-            weightGoal: null
+            weightGoal: null,
+            email: null,
+            lastWorkflowRun: null,
+            automationEnabled: false
         };
+
+        // Load saved data from localStorage
+        function loadUserData() {
+            const saved = localStorage.getItem('healthTrackerData');
+            if (saved) {
+                userData = { ...userData, ...JSON.parse(saved) };
+                populateForm();
+                updateAutomationStatus();
+            }
+        }
+
+        // Save data to localStorage
+        function saveUserData() {
+            localStorage.setItem('healthTrackerData', JSON.stringify(userData));
+        }
+
+        // Populate form with saved data
+        function populateForm() {
+            if (userData.weight) document.getElementById('weight').value = userData.weight;
+            if (userData.height) document.getElementById('height').value = userData.height;
+            if (userData.sleepHours) document.getElementById('sleepHours').value = userData.sleepHours;
+            if (userData.exerciseMinutes !== null) document.getElementById('exerciseMinutes').value = userData.exerciseMinutes;
+            if (userData.weightGoal) document.getElementById('weightGoal').value = userData.weightGoal;
+            if (userData.email) document.getElementById('email').value = userData.email;
+            if (userData.automationEnabled) document.getElementById('automationEnabled').checked = true;
+        }
+
+        // Update automation status display
+        function updateAutomationStatus() {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            if (userData.automationEnabled) {
+                indicator.className = 'status-indicator status-active';
+                statusText.textContent = 'Active - Next run: Sunday 9:00 AM';
+            } else {
+                indicator.className = 'status-indicator status-inactive';
+                statusText.textContent = 'Inactive';
+            }
+        }
+
+        // Toggle automation
+        function toggleAutomation() {
+            userData.automationEnabled = document.getElementById('automationEnabled').checked;
+            saveUserData();
+            updateAutomationStatus();
+            
+            if (userData.automationEnabled) {
+                showNotification('🤖 Weekly automation enabled! Reports will be sent every Sunday at 9 AM.');
+            } else {
+                showNotification('⏸️ Weekly automation disabled.');
+            }
+        }
+
+        // Check if it's time for weekly automation
+        function isTimeForWeeklyAutomation() {
+            const now = new Date();
+            const lastRun = userData.lastWorkflowRun ? new Date(userData.lastWorkflowRun) : null;
+            
+            // Check if it's Sunday and 9 AM, and hasn't run this week
+            if (now.getDay() === 0 && now.getHours() === 9 && now.getMinutes() < 5) {
+                if (!lastRun || (now - lastRun) > 7 * 24 * 60 * 60 * 1000) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Automated workflow trigger
+        function triggerAutomatedWorkflow() {
+            if (!userData.email || !userData.weight || !userData.height || !userData.sleepHours) {
+                console.log('Automated workflow skipped: Missing required data');
+                return;
+            }
+
+            console.log('🤖 Triggering automated weekly workflow...');
+            
+            // Generate recommendations
+            const weightUnit = document.getElementById('weightUnit').value;
+            const heightUnit = document.getElementById('heightUnit').value;
+            const bmi = calculateBMI(userData.weight, userData.height, weightUnit, heightUnit);
+            const bmiCategory = getBMICategory(bmi);
+            
+            const dietRecs = generateDietRecommendations(bmi);
+            const sleepRecs = generateSleepRecommendations(bmi, userData.sleepHours);
+            const mealPlan = generateMealPlan(bmi, userData.weightGoal, userData.weight);
+            
+            // Send automated email
+            sendAutomatedEmail(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
+            
+            // Update last run time
+            userData.lastWorkflowRun = new Date().toISOString();
+            saveUserData();
+        }
+
+        // Send automated email (simulated)
+        function sendAutomatedEmail(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan) {
+            const emailContent = `
+                Weekly Health Report - ${new Date().toLocaleDateString()}
+                
+                BMI: ${bmi.toFixed(1)} (${bmiCategory})
+                
+                Diet Recommendations:
+                ${dietRecs.map(rec => `• ${rec}`).join('\n')}
+                
+                Sleep Recommendations:
+                ${sleepRecs.map(rec => `• ${rec}`).join('\n')}
+                
+                Meal Plan:
+                Breakfast: ${mealPlan.breakfast.join(', ')}
+                Lunch: ${mealPlan.lunch.join(', ')}
+                Dinner: ${mealPlan.dinner.join(', ')}
+                Snacks: ${mealPlan.snacks.join(', ')}
+                
+                Generated automatically by Health Workflow Automation
+            `;
+            
+            // Simulate email sending
+            console.log(`📧 Email sent to ${userData.email}:`);
+            console.log(emailContent);
+            
+            // Show notification
+            showNotification('📧 Weekly health report sent to your email!');
+        }
+
+        // Test automation
+        function testAutomation() {
+            if (!userData.email || !userData.weight || !userData.height || !userData.sleepHours) {
+                alert('Please fill in all required fields and email to test automation');
+                return;
+            }
+            
+            showNotification('🧪 Testing automation...');
+            setTimeout(() => {
+                triggerAutomatedWorkflow();
+            }, 1000);
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                font-weight: 500;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Check for automation every minute
+        function checkAutomation() {
+            if (userData.automationEnabled && isTimeForWeeklyAutomation()) {
+                triggerAutomatedWorkflow();
+            }
+        }
+
+        // Start automation monitoring
+        function startAutomation() {
+            setInterval(checkAutomation, 60000); // Check every minute
+            console.log('🤖 Workflow automation monitoring started');
+        }
 
         // BMI Calculation
         function calculateBMI(weight, height, weightUnit, heightUnit) {
@@ -446,6 +674,7 @@
             const sleepHours = parseFloat(document.getElementById('sleepHours').value);
             const exerciseMinutes = parseFloat(document.getElementById('exerciseMinutes').value);
             const weightGoal = parseFloat(document.getElementById('weightGoal').value);
+            const email = document.getElementById('email').value;
             const weightUnit = document.getElementById('weightUnit').value;
             const heightUnit = document.getElementById('heightUnit').value;
             const goalUnit = document.getElementById('goalUnit').value;
@@ -471,6 +700,15 @@
                 return;
             }
             
+            // Save user data
+            userData.weight = weight;
+            userData.height = height;
+            userData.sleepHours = sleepHours;
+            userData.exerciseMinutes = exerciseMinutes;
+            userData.weightGoal = weightGoal;
+            userData.email = email;
+            saveUserData();
+            
             // Calculate BMI
             const bmi = calculateBMI(weight, height, weightUnit, heightUnit);
             const bmiCategory = getBMICategory(bmi);
@@ -491,12 +729,12 @@
             // Generate meal plan
             const mealPlan = generateMealPlan(bmi, weightGoal, weight);
             const mealPlanHtml = 
-                '<div class="meal-options">' + mealPlan.breakfast.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
+                '<h5>Breakfast:</h5><div class="meal-options">' + mealPlan.breakfast.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
                 '<h5>Lunch:</h5><div class="meal-options">' + mealPlan.lunch.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
                 '<h5>Dinner:</h5><div class="meal-options">' + mealPlan.dinner.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
                 '<h5>Snacks:</h5><div class="meal-options">' + mealPlan.snacks.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>';
             
-            document.getElementById('mealPlanContent').innerHTML = '<h5>Breakfast:</h5>' + mealPlanHtml;
+            document.getElementById('mealPlanContent').innerHTML = mealPlanHtml;
             
             // Generate timeline
             if (weightGoal) {
@@ -531,6 +769,9 @@
 
         // Auto-sync units
         document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            startAutomation();
+            
             document.getElementById('weightUnit').addEventListener('change', function() {
                 document.getElementById('goalUnit').value = this.value;
             });
