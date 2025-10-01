@@ -405,6 +405,131 @@
             background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
         }
 
+        /* Authentication Page Styles */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .auth-header p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        /* Auth Tabs */
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: #ecf0f1;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #d5dbdb;
+            color: #2c3e50;
+        }
+
+        /* Auth Forms */
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .auth-footer p {
+            margin: 8px 0;
+            color: #7f8c8d;
+        }
+
+        .auth-footer a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-footer a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        /* Auth Form Specific Styles */
+        #authSection .form {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        #authSection .input-group {
+            margin-bottom: 20px;
+        }
+
+        #authSection .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        #authSection .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        #authSection .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Terms and Privacy Links */
+        .checkbox-group a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .checkbox-group a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -426,12 +551,99 @@
             <h1><i class="fas fa-weight"></i> Weight Tracking</h1>
         </div>
 
-        <div class="automation-status">
-            <span class="status-indicator status-inactive" id="statusIndicator"></span>
-            <strong>Automation Status:</strong> <span id="statusText">Inactive</span>
+        <!-- Authentication Section -->
+        <div id="authSection">
+            <div class="form">
+                <div class="auth-header">
+                    <h2><i class="fas fa-user-circle"></i> Welcome to Weight Tracking</h2>
+                    <p>Sign in to your account or create a new one</p>
+                </div>
+
+                <!-- Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="tab-btn active" id="signInTab" onclick="switchTab('signIn')">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                    <button class="tab-btn" id="signUpTab" onclick="switchTab('signUp')">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </div>
+
+                <!-- Sign In Form -->
+                <div id="signInForm" class="auth-form active">
+                    <div class="input-group">
+                        <label for="loginEmail">Email or User ID</label>
+                        <input type="text" id="loginEmail" placeholder="Enter your email or user ID">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+
+                    <button class="btn" onclick="performLogin()">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+
+                    <div class="auth-footer">
+                        <p><a href="#" onclick="showForgotPassword()">Forgot your password?</a></p>
+                    </div>
+                </div>
+
+                <!-- Sign Up Form -->
+                <div id="signUpForm" class="auth-form">
+                    <div class="input-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email address">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreeTerms">
+                        <label for="agreeTerms">I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#" onclick="showPrivacy()">Privacy Policy</a></label>
+                    </div>
+
+                    <button class="btn" onclick="performSignup()">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+
+                    <div class="auth-footer">
+                        <p>Already have an account? <a href="#" onclick="switchTab('signIn')">Sign in here</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="form">
+        <!-- Main Application Section (Hidden Initially) -->
+        <div id="mainAppSection" style="display: none;">
+            <div class="automation-status">
+                <span class="status-indicator status-inactive" id="statusIndicator"></span>
+                <strong>Automation Status:</strong> <span id="statusText">Inactive</span>
+                <button class="btn btn-logout" onclick="logout()" style="float: right; padding: 8px 16px; font-size: 0.9rem;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <div class="form">
             <div class="input-group">
                 <label for="weight">Weight</label>
                 <div class="input-row">
@@ -492,6 +704,7 @@
             </button>
         </div>
 
+        </div>
 
         <!-- Meal Plan Dashboard Section -->
         <div id="mealPlanDashboard" style="display: none;">
@@ -554,8 +767,222 @@
             automationEnabled: false
         };
 
+        // Login state
+        let currentUser = null;
+        let isLoggedIn = false;
+
         // Current health report data
         let currentReport = null;
+
+        // Authentication Functions
+        function switchTab(tab) {
+            console.log('Switching to tab:', tab);
+            
+            // Remove active class from all tabs and forms
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            
+            if (tab === 'signIn') {
+                document.getElementById('signInTab').classList.add('active');
+                document.getElementById('signInForm').classList.add('active');
+            } else if (tab === 'signUp') {
+                document.getElementById('signUpTab').classList.add('active');
+                document.getElementById('signUpForm').classList.add('active');
+            }
+        }
+        
+        function performLogin() {
+            console.log('Login attempt');
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Basic validation
+            if (!email || !password) {
+                alert('Please enter both email/user ID and password');
+                return;
+            }
+            
+            // Simple authentication (in real app, this would be server-side)
+            if (authenticateUser(email, password)) {
+                console.log('Login successful');
+                
+                // Set login state
+                currentUser = email;
+                isLoggedIn = true;
+                
+                // Remember user if checkbox is checked
+                if (rememberMe) {
+                    localStorage.setItem('rememberedUser', email);
+                }
+                
+                // Show main app
+                showMainApp();
+                
+                // Show success message
+                alert('Login successful! Welcome to your health tracking dashboard.');
+            } else {
+                console.log('Login failed');
+                alert('Invalid credentials. Please try again.');
+            }
+        }
+        
+        function performSignup() {
+            console.log('Signup attempt');
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            const confirmPassword = document.getElementById('signupConfirmPassword').value.trim();
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            
+            // Basic validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            if (!agreeTerms) {
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+            
+            // Check if user already exists
+            if (userExists(email)) {
+                alert('An account with this email already exists. Please sign in instead.');
+                switchTab('signIn');
+                return;
+            }
+            
+            // Create new user account
+            if (createUserAccount(name, email, password)) {
+                console.log('Signup successful');
+                
+                // Set login state
+                currentUser = email;
+                isLoggedIn = true;
+                
+                // Show main app
+                showMainApp();
+                
+                // Show success message
+                alert('Account created successfully! Welcome to Weight Tracking!');
+            } else {
+                console.log('Signup failed');
+                alert('Failed to create account. Please try again.');
+            }
+        }
+        
+        function authenticateUser(email, password) {
+            // Simple demo authentication
+            // In a real app, this would be a server call
+            const validUsers = {
+                'admin': 'admin123',
+                'user': 'user123',
+                'demo': 'demo123',
+                'test@example.com': 'test123'
+            };
+            
+            return validUsers[email] === password;
+        }
+        
+        function userExists(email) {
+            // Check if user already exists in localStorage
+            const users = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+            return users.hasOwnProperty(email);
+        }
+        
+        function createUserAccount(name, email, password) {
+            try {
+                // Get existing users
+                const users = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                
+                // Add new user
+                users[email] = {
+                    name: name,
+                    email: email,
+                    password: password, // In real app, this would be hashed
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+                
+                console.log('User account created:', email);
+                return true;
+            } catch (error) {
+                console.error('Error creating user account:', error);
+                return false;
+            }
+        }
+        
+        function showMainApp() {
+            console.log('Showing main app');
+            
+            // Hide auth section
+            document.getElementById('authSection').style.display = 'none';
+            
+            // Show main app section
+            document.getElementById('mainAppSection').style.display = 'block';
+            
+            // Load user data
+            loadUserData();
+        }
+        
+        function showForgotPassword() {
+            alert('Password reset functionality would be implemented here. For demo purposes, use:\n\nEmail: admin\nPassword: admin123\n\nOr\n\nEmail: user\nPassword: user123');
+        }
+        
+        function showTerms() {
+            alert('Terms of Service:\n\n1. Use this application responsibly\n2. Keep your health data secure\n3. Consult healthcare professionals for medical advice\n4. We respect your privacy and data');
+        }
+        
+        function showPrivacy() {
+            alert('Privacy Policy:\n\n1. Your data is stored locally in your browser\n2. We do not collect personal information\n3. Email reports are sent only when you request them\n4. You can reset all data at any time');
+        }
+        
+        function logout() {
+            console.log('Logging out');
+            
+            // Clear login state
+            currentUser = null;
+            isLoggedIn = false;
+            
+            // Clear remembered user
+            localStorage.removeItem('rememberedUser');
+            
+            // Hide main app
+            document.getElementById('mainAppSection').style.display = 'none';
+            
+            // Show auth section
+            document.getElementById('authSection').style.display = 'block';
+            
+            // Clear form fields
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('rememberMe').checked = false;
+            document.getElementById('signupName').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('signupConfirmPassword').value = '';
+            document.getElementById('agreeTerms').checked = false;
+            
+            // Switch to sign in tab
+            switchTab('signIn');
+            
+            console.log('Logged out successfully');
+        }
 
         // EmailJS Configuration (Public keys - safe to expose)
         const EMAILJS_CONFIG = {
@@ -1317,12 +1744,31 @@ Generated by Weight Tracking
         }
 
         // Auto-sync units
+        // Auto-sync units and initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, JavaScript initialized');
-            loadUserData();
+            
+            // Check if user is remembered
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                console.log('Remembered user found:', rememberedUser);
+                // Auto-login remembered user
+                currentUser = rememberedUser;
+                isLoggedIn = true;
+                showMainApp();
+            } else {
+                console.log('No remembered user, showing auth section');
+                // Show auth section by default
+                document.getElementById('authSection').style.display = 'block';
+            }
+            
+            // Initialize automation
             startAutomation();
+            
+            // Initialize EmailJS
             initializeEmailJS();
             
+            // Auto-sync units
             document.getElementById('weightUnit').addEventListener('change', function() {
                 document.getElementById('goalUnit').value = this.value;
             });
