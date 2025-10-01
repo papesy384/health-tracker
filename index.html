@@ -519,6 +519,41 @@
             margin-top: 10px;
         }
 
+        /* Password Container Styles */
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding-right: 45px; /* Space for toggle button */
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7f8c8d;
+            font-size: 1rem;
+            padding: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #3498db;
+        }
+
+        .password-toggle:focus {
+            outline: none;
+            color: #2980b9;
+        }
+
         /* Terms and Privacy Links */
         .checkbox-group a {
             color: #3498db;
@@ -578,7 +613,12 @@
 
                     <div class="input-group">
                         <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                        <div class="password-container">
+                            <input type="password" id="loginPassword" placeholder="Enter your password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                                <i class="fas fa-eye" id="loginPasswordIcon"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="checkbox-group">
@@ -609,12 +649,22 @@
 
                     <div class="input-group">
                         <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" placeholder="Create a password">
+                        <div class="password-container">
+                            <input type="password" id="signupPassword" placeholder="Create a password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('signupPassword')">
+                                <i class="fas fa-eye" id="signupPasswordIcon"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="input-group">
                         <label for="signupConfirmPassword">Confirm Password</label>
-                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
+                        <div class="password-container">
+                            <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('signupConfirmPassword')">
+                                <i class="fas fa-eye" id="signupConfirmPasswordIcon"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="checkbox-group">
@@ -788,6 +838,26 @@
             } else if (tab === 'signUp') {
                 document.getElementById('signUpTab').classList.add('active');
                 document.getElementById('signUpForm').classList.add('active');
+            }
+        }
+        
+        // Password visibility toggle function
+        function togglePassword(inputId) {
+            console.log('Toggling password visibility for:', inputId);
+            
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + 'Icon');
+            
+            if (input.type === 'password') {
+                // Show password
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                // Hide password
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
         
