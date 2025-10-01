@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Workflow Automation</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -139,6 +140,11 @@
             background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
         }
 
+        .btn-loading {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            cursor: not-allowed;
+        }
+
         .results {
             background: white;
             border-radius: 15px;
@@ -267,7 +273,7 @@
             margin-bottom: 10px;
         }
 
-        .debug-info {
+        .email-status {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -275,6 +281,24 @@
             margin-bottom: 15px;
             font-family: monospace;
             font-size: 0.9rem;
+        }
+
+        .status-success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .status-loading {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
         }
 
         @media (max-width: 768px) {
@@ -348,7 +372,7 @@
             </div>
 
             <div class="input-group">
-                <label for="email">Email (for health reports)</label>
+                <label for="email">Email (for automatic reports)</label>
                 <input type="email" id="email" placeholder="your@email.com">
             </div>
 
@@ -358,9 +382,8 @@
             </div>
 
             <button class="btn" onclick="generateRecommendations()">Generate Health Plan</button>
-            <button class="btn btn-secondary" onclick="sendEmailReport()">Send Email Report</button>
-            <button class="btn btn-tertiary" onclick="openEmailClient()">Open Email Client</button>
-            <button class="btn btn-test" onclick="testEmailFunction()">Test Email Function</button>
+            <button class="btn btn-secondary" onclick="sendEmailAutomatically()" id="sendEmailBtn">Send Email Automatically</button>
+            <button class="btn btn-tertiary" onclick="testEmailServices()">Test Email Services</button>
         </div>
 
         <div class="results" id="results">
@@ -386,16 +409,15 @@
             </div>
 
             <div class="email-options" id="emailOptions" style="display: none;">
-                <h4>Email Options</h4>
-                <p>Choose how you'd like to receive your health report:</p>
-                <button class="btn btn-secondary" onclick="sendEmailReport()">Send to My Email</button>
-                <button class="btn btn-tertiary" onclick="openEmailClient()">Open Email Client</button>
+                <h4>Automatic Email Delivery</h4>
+                <p>Your health report will be sent automatically to your email address.</p>
+                <button class="btn btn-secondary" onclick="sendEmailAutomatically()" id="sendEmailBtn2">Send Email Automatically</button>
                 <button class="btn" onclick="copyToClipboard()">Copy Report to Clipboard</button>
             </div>
 
-            <div class="debug-info" id="debugInfo" style="display: none;">
-                <h4>Debug Information</h4>
-                <div id="debugContent"></div>
+            <div class="email-status" id="emailStatus" style="display: none;">
+                <h4>Email Status</h4>
+                <div id="emailStatusContent"></div>
             </div>
         </div>
     </div>
@@ -417,6 +439,25 @@
 
         // Current health report data
         let currentReport = null;
+
+        // EmailJS Configuration (Public keys - safe to expose)
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_health_tracker',
+            templateId: 'template_health_report',
+            publicKey: 'your_public_key_here'
+        };
+
+        // Initialize EmailJS
+        function initializeEmailJS() {
+            try {
+                emailjs.init(EMAILJS_CONFIG.publicKey);
+                console.log('📧 EmailJS initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('📧 EmailJS initialization failed:', error);
+                return false;
+            }
+        }
 
         // Load saved data from localStorage
         function loadUserData() {
@@ -471,41 +512,9 @@
             }
         }
 
-        // Test email function
-        function testEmailFunction() {
-            console.log('🧪 Testing email function...');
-            
-            // Check if we have current report
-            if (!currentReport) {
-                alert('Please generate a health plan first, then test the email function');
-                return;
-            }
-            
-            // Check if we have email
-            if (!userData.email) {
-                alert('Please enter your email address first');
-                return;
-            }
-            
-            // Show debug info
-            const debugContent = `
-                Email: ${userData.email}
-                Current Report: ${currentReport ? 'Available' : 'Not Available'}
-                BMI: ${currentReport ? currentReport.bmi : 'N/A'}
-                Browser: ${navigator.userAgent}
-                Mailto Support: ${navigator.userAgent.includes('Chrome') ? 'Yes' : 'Unknown'}
-            `;
-            
-            document.getElementById('debugContent').innerHTML = debugContent.replace(/\n/g, '<br>');
-            document.getElementById('debugInfo').style.display = 'block';
-            
-            // Test the actual email function
-            sendEmailReport();
-        }
-
-        // Send email report (FIXED VERSION)
-        function sendEmailReport() {
-            console.log('📧 sendEmailReport called');
+        // Send email automatically using multiple services
+        async function sendEmailAutomatically() {
+            console.log('📧 sendEmailAutomatically called');
             
             // Check if we have current report
             if (!currentReport) {
@@ -519,58 +528,180 @@
                 return;
             }
             
-            console.log('📧 Preparing email for:', userData.email);
+            // Show loading state
+            setEmailStatus('loading', 'Sending email automatically...');
+            setButtonLoading(true);
             
             const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
             const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
             
-            // Create mailto link
-            const subject = encodeURIComponent(`Health Report - ${new Date().toLocaleDateString()}`);
-            const body = encodeURIComponent(emailContent);
-            const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
+            // Try multiple email services
+            const emailSent = await tryEmailServices(userData.email, emailContent);
             
-            console.log('📧 Mailto link:', mailtoLink);
+            if (emailSent) {
+                setEmailStatus('success', '✅ Email sent successfully! Check your inbox.');
+                showNotification('📧 Email sent automatically! Check your inbox.');
+            } else {
+                setEmailStatus('error', '❌ Failed to send email automatically. Please try the manual options below.');
+                showNotification('❌ Email sending failed. Please try manual options.');
+            }
             
-            // Try to open email client
+            setButtonLoading(false);
+        }
+
+        // Try multiple email services
+        async function tryEmailServices(email, content) {
+            // Service 1: EmailJS
+            if (await sendWithEmailJS(email, content)) {
+                return true;
+            }
+            
+            // Service 2: Formspree
+            if (await sendWithFormspree(email, content)) {
+                return true;
+            }
+            
+            // Service 3: Netlify Forms
+            if (await sendWithNetlify(email, content)) {
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Send with EmailJS
+        async function sendWithEmailJS(email, content) {
             try {
-                // Use window.location.href instead of window.open for better compatibility
-                window.location.href = mailtoLink;
-                showNotification('📧 Email client opened with your health report!');
+                console.log('📧 Trying EmailJS...');
+                
+                const templateParams = {
+                    to_email: email,
+                    subject: `Health Report - ${new Date().toLocaleDateString()}`,
+                    message: content,
+                    from_name: 'Health Workflow Automation'
+                };
+                
+                const response = await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams
+                );
+                
+                console.log('📧 EmailJS success:', response);
+                return true;
             } catch (error) {
-                console.error('📧 Error opening email client:', error);
-                // Fallback: copy to clipboard
-                copyToClipboard();
-                showNotification('📋 Health report copied to clipboard! Paste it into your email.');
+                console.error('📧 EmailJS failed:', error);
+                return false;
             }
         }
 
-        // Open email client with pre-filled content
-        function openEmailClient() {
-            console.log('📧 openEmailClient called');
+        // Send with Formspree
+        async function sendWithFormspree(email, content) {
+            try {
+                console.log('📧 Trying Formspree...');
+                
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('subject', `Health Report - ${new Date().toLocaleDateString()}`);
+                formData.append('message', content);
+                formData.append('_replyto', email);
+                
+                const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    console.log('📧 Formspree success');
+                    return true;
+                } else {
+                    throw new Error('Formspree response not ok');
+                }
+            } catch (error) {
+                console.error('📧 Formspree failed:', error);
+                return false;
+            }
+        }
+
+        // Send with Netlify Forms
+        async function sendWithNetlify(email, content) {
+            try {
+                console.log('📧 Trying Netlify Forms...');
+                
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('subject', `Health Report - ${new Date().toLocaleDateString()}`);
+                formData.append('message', content);
+                formData.append('form-name', 'health-report');
+                
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    console.log('📧 Netlify Forms success');
+                    return true;
+                } else {
+                    throw new Error('Netlify response not ok');
+                }
+            } catch (error) {
+                console.error('📧 Netlify Forms failed:', error);
+                return false;
+            }
+        }
+
+        // Test email services
+        async function testEmailServices() {
+            console.log('🧪 Testing email services...');
             
-            if (!currentReport) {
-                alert('Please generate a health plan first');
+            if (!userData.email) {
+                alert('Please enter your email address first');
                 return;
             }
-
-            const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
-            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
             
-            const subject = encodeURIComponent(`Health Report - ${new Date().toLocaleDateString()}`);
-            const body = encodeURIComponent(emailContent);
-            const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+            setEmailStatus('loading', 'Testing email services...');
             
-            console.log('📧 Generic mailto link:', mailtoLink);
+            const testContent = `Test email from Health Workflow Automation - ${new Date().toLocaleString()}`;
+            const emailSent = await tryEmailServices(userData.email, testContent);
             
-            try {
-                window.location.href = mailtoLink;
-                showNotification('📧 Email client opened with your health report!');
-            } catch (error) {
-                console.error('📧 Error opening email client:', error);
-                // Fallback: copy to clipboard
-                copyToClipboard();
-                showNotification('📋 Health report copied to clipboard! Paste it into your email.');
+            if (emailSent) {
+                setEmailStatus('success', '✅ Test email sent successfully! Check your inbox.');
+            } else {
+                setEmailStatus('error', '❌ All email services failed. Please check configuration.');
             }
+        }
+
+        // Set email status
+        function setEmailStatus(type, message) {
+            const statusDiv = document.getElementById('emailStatus');
+            const contentDiv = document.getElementById('emailStatusContent');
+            
+            statusDiv.className = `email-status status-${type}`;
+            contentDiv.innerHTML = message;
+            statusDiv.style.display = 'block';
+        }
+
+        // Set button loading state
+        function setButtonLoading(loading) {
+            const buttons = ['sendEmailBtn', 'sendEmailBtn2'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    if (loading) {
+                        btn.classList.add('btn-loading');
+                        btn.disabled = true;
+                        btn.textContent = 'Sending...';
+                    } else {
+                        btn.classList.remove('btn-loading');
+                        btn.disabled = false;
+                        btn.textContent = 'Send Email Automatically';
+                    }
+                }
+            });
         }
 
         // Copy report to clipboard
@@ -660,7 +791,7 @@ Generated by Health Workflow Automation
         }
 
         // Automated workflow trigger
-        function triggerAutomatedWorkflow() {
+        async function triggerAutomatedWorkflow() {
             if (!userData.email || !userData.weight || !userData.height || !userData.sleepHours) {
                 console.log('Automated workflow skipped: Missing required data');
                 return;
@@ -679,7 +810,8 @@ Generated by Health Workflow Automation
             const mealPlan = generateComprehensiveMealPlan(bmi, userData.weightGoal, userData.weight);
             
             // Send automated email
-            sendEmailReport();
+            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
+            await tryEmailServices(userData.email, emailContent);
             
             // Update last run time
             userData.lastWorkflowRun = new Date().toISOString();
@@ -1034,6 +1166,7 @@ Generated by Health Workflow Automation
         document.addEventListener('DOMContentLoaded', function() {
             loadUserData();
             startAutomation();
+            initializeEmailJS();
             
             document.getElementById('weightUnit').addEventListener('change', function() {
                 document.getElementById('goalUnit').value = this.value;
