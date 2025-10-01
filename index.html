@@ -321,6 +321,123 @@
             font-size: 0.9rem;
         }
 
+        .meal-plan-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .meal-plan-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .meal-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .meal-option {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #28a745;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .weekly-target {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            margin-top: 15px;
+        }
+
+        .weekly-target h4 {
+            color: #2d5a2d;
+            margin-bottom: 8px;
+        }
+
+        .weekly-target p {
+            color: #2d5a2d;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .timeline-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin-top: 15px;
+        }
+
+        .timeline-section h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .timeline-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .timeline-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .timeline-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #856404;
+        }
+
+        .timeline-label {
+            font-size: 0.8rem;
+            color: #856404;
+            margin-top: 5px;
+        }
+
+        .milestone-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .milestone-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .milestone-item:last-child {
+            border-bottom: none;
+        }
+
+        .milestone-week {
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .milestone-weight {
+            color: #333;
+        }
+
+        .milestone-progress {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -350,7 +467,7 @@
         <!-- Workflow Status -->
         <div class="workflow-status">
             <span class="status-indicator status-active"></span>
-            <strong>Workflow Status:</strong> Active - Next weekly trigger: <span id="nextTrigger">Sunday 9:00 AM</span>
+            <strong>Workflow Status:</strong> Active - Ready for weekly data input and automated recommendations
         </div>
 
         <div class="dashboard">
@@ -466,47 +583,69 @@
                         <span class="metric-value" id="weightProgress">--</span>
                     </div>
                 </div>
+
+                <div class="timeline-section" id="timelineSection" style="display: none;">
+                    <h4><i class="fas fa-calendar-alt"></i> Realistic Timeline</h4>
+                    <div class="timeline-info">
+                        <div class="timeline-item">
+                            <div class="timeline-value" id="totalWeeks">--</div>
+                            <div class="timeline-label">Total Weeks</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-value" id="weeklyRate">--</div>
+                            <div class="timeline-label">Weekly Change</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-value" id="timelineType">--</div>
+                            <div class="timeline-label">Timeline Type</div>
+                        </div>
+                    </div>
+                    <div class="milestone-list" id="milestoneList"></div>
+                </div>
             </div>
 
-            <!-- Automated Reminders Card -->
+            <!-- Personalized Meal Plan Card -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-bell card-icon"></i>
-                    <h3 class="card-title">Automated Reminders</h3>
+                    <i class="fas fa-utensils card-icon"></i>
+                    <h3 class="card-title">Personalized Meal Plan</h3>
                 </div>
                 
-                <div class="reminder-schedule">
-                    <h4><i class="fas fa-clock"></i> Fixed Schedule</h4>
-                    
-                    <div class="reminder-item">
-                        <span class="reminder-time">7:00 AM</span>
-                        <span class="reminder-status status-enabled">Breakfast Reminder</span>
+                <div id="mealPlanContent" style="display: none;">
+                    <div class="meal-plan-section">
+                        <h4><i class="fas fa-sun"></i> Breakfast Options</h4>
+                        <div id="breakfastOptions" class="meal-options"></div>
                     </div>
                     
-                    <div class="reminder-item">
-                        <span class="reminder-time">1:00 PM</span>
-                        <span class="reminder-status status-enabled">Lunch Reminder</span>
+                    <div class="meal-plan-section">
+                        <h4><i class="fas fa-sun"></i> Lunch Options</h4>
+                        <div id="lunchOptions" class="meal-options"></div>
                     </div>
                     
-                    <div class="reminder-item">
-                        <span class="reminder-time">8:00 PM</span>
-                        <span class="reminder-status status-enabled">Dinner Reminder</span>
+                    <div class="meal-plan-section">
+                        <h4><i class="fas fa-moon"></i> Dinner Options</h4>
+                        <div id="dinnerOptions" class="meal-options"></div>
                     </div>
                     
-                    <div class="reminder-item">
-                        <span class="reminder-time">4:00 PM</span>
-                        <span class="reminder-status status-enabled">Activity Reminder</span>
+                    <div class="meal-plan-section">
+                        <h4><i class="fas fa-apple-alt"></i> Snack Options</h4>
+                        <div id="snackOptions" class="meal-options"></div>
                     </div>
                     
-                    <div class="reminder-item">
-                        <span class="reminder-time">9:00 PM</span>
-                        <span class="reminder-status status-enabled">Sleep Reminder</span>
+                    <div class="meal-plan-section">
+                        <h4><i class="fas fa-tint"></i> Hydration</h4>
+                        <div id="hydrationOptions" class="meal-options"></div>
                     </div>
                     
-                    <div class="reminder-item">
-                        <span class="reminder-time">Sunday 9:00 AM</span>
-                        <span class="reminder-status status-enabled">Weekly Data Prompt</span>
+                    <div class="weekly-target">
+                        <h4><i class="fas fa-target"></i> Weekly Target</h4>
+                        <p id="weeklyTargetText"></p>
                     </div>
+                </div>
+                
+                <div id="noMealPlanMessage" style="text-align: center; color: #666; padding: 20px;">
+                    <i class="fas fa-utensils" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Enter your weekly data to generate a personalized meal plan</p>
                 </div>
 
                 <button class="btn" onclick="testEmailDelivery()">
@@ -534,7 +673,7 @@
                 <div class="step-number">2</div>
                 <div class="step-content">
                     <div class="step-title">Processing Pipeline</div>
-                    <div class="step-description">Automatic BMI calculation and generation of Diet & Sleep recommendations</div>
+                    <div class="step-description">Automatic BMI calculation, healthy weight goal generation, personalized meal plan creation, and realistic timeline calculation</div>
                 </div>
             </div>
             
@@ -542,7 +681,7 @@
                 <div class="step-number">3</div>
                 <div class="step-content">
                     <div class="step-title">Automated Action</div>
-                    <div class="step-description">Email delivery of personalized recommendations to user</div>
+                    <div class="step-description">Email delivery of comprehensive health recommendations including meal plans and step-by-step weight goals</div>
                 </div>
             </div>
         </div>
@@ -585,6 +724,116 @@
             if (bmi < 25) return 'Normal weight';
             if (bmi < 30) return 'Overweight';
             return 'Obese';
+        }
+
+        // Generate Personalized Meal Plan based on BMI and goals
+        function generatePersonalizedMealPlan(bmi, sleepHours, weightGoal, currentWeight) {
+            const mealPlan = {
+                breakfast: [],
+                lunch: [],
+                dinner: [],
+                snacks: [],
+                hydration: [],
+                weeklyTarget: ''
+            };
+            
+            const isWeightLoss = weightGoal.isMaintenance === false && currentWeight > weightGoal.value;
+            const isWeightGain = weightGoal.isMaintenance === false && currentWeight < weightGoal.value;
+            
+            if (bmi < 18.5 || isWeightGain) {
+                // Weight gain meal plan
+                mealPlan.breakfast = [
+                    'Oatmeal with nuts, seeds, and dried fruit',
+                    'Greek yogurt with granola and berries',
+                    'Whole grain toast with avocado and eggs',
+                    'Smoothie with protein powder, banana, and nut butter'
+                ];
+                mealPlan.lunch = [
+                    'Quinoa bowl with chicken, vegetables, and tahini dressing',
+                    'Whole grain pasta with lean meat and vegetables',
+                    'Salmon salad with mixed greens and olive oil',
+                    'Bean and rice bowl with cheese and vegetables'
+                ];
+                mealPlan.dinner = [
+                    'Grilled chicken with sweet potato and steamed broccoli',
+                    'Baked fish with brown rice and roasted vegetables',
+                    'Lean beef stir-fry with brown rice noodles',
+                    'Turkey meatballs with whole wheat pasta and marinara'
+                ];
+                mealPlan.snacks = [
+                    'Mixed nuts and dried fruit',
+                    'Cheese and whole grain crackers',
+                    'Hummus with vegetables',
+                    'Greek yogurt with honey and granola'
+                ];
+                mealPlan.weeklyTarget = 'Increase caloric intake by 300-500 calories daily';
+                
+            } else if (bmi >= 18.5 && bmi < 25 && !isWeightLoss) {
+                // Maintenance meal plan
+                mealPlan.breakfast = [
+                    'Greek yogurt with berries and granola',
+                    'Whole grain cereal with milk and fruit',
+                    'Eggs with whole grain toast and vegetables',
+                    'Overnight oats with nuts and fruit'
+                ];
+                mealPlan.lunch = [
+                    'Grilled chicken salad with mixed vegetables',
+                    'Turkey and vegetable wrap with whole grain tortilla',
+                    'Quinoa bowl with vegetables and lean protein',
+                    'Lentil soup with whole grain bread'
+                ];
+                mealPlan.dinner = [
+                    'Baked salmon with roasted vegetables',
+                    'Grilled chicken with quinoa and steamed broccoli',
+                    'Vegetable stir-fry with tofu and brown rice',
+                    'Lean beef with sweet potato and green beans'
+                ];
+                mealPlan.snacks = [
+                    'Apple with almond butter',
+                    'Vegetable sticks with hummus',
+                    'Greek yogurt with berries',
+                    'Mixed nuts (small portion)'
+                ];
+                mealPlan.weeklyTarget = 'Maintain balanced nutrition with variety';
+                
+            } else if (bmi >= 25 || isWeightLoss) {
+                // Weight loss meal plan
+                mealPlan.breakfast = [
+                    'Greek yogurt with berries and chia seeds',
+                    'Vegetable omelet with whole grain toast',
+                    'Overnight oats with protein powder and fruit',
+                    'Smoothie bowl with spinach, berries, and protein'
+                ];
+                mealPlan.lunch = [
+                    'Large salad with lean protein and olive oil dressing',
+                    'Vegetable soup with grilled chicken',
+                    'Quinoa bowl with vegetables and light dressing',
+                    'Turkey and vegetable lettuce wraps'
+                ];
+                mealPlan.dinner = [
+                    'Grilled fish with steamed vegetables',
+                    'Baked chicken with roasted vegetables',
+                    'Vegetable stir-fry with lean protein',
+                    'Turkey meatballs with zucchini noodles'
+                ];
+                mealPlan.snacks = [
+                    'Celery with almond butter',
+                    'Greek yogurt with berries',
+                    'Vegetable sticks with hummus',
+                    'Apple slices with cinnamon'
+                ];
+                mealPlan.weeklyTarget = 'Create caloric deficit of 500-750 calories daily';
+            }
+            
+            // Hydration recommendations
+            mealPlan.hydration = [
+                'Drink 8-10 glasses of water daily',
+                'Start each meal with a glass of water',
+                'Limit sugary drinks and alcohol',
+                'Include herbal teas and sparkling water'
+            ];
+            
+            return mealPlan;
         }
 
         // Generate Diet Recommendations based on BMI
@@ -693,6 +942,48 @@
             };
         }
 
+        // Calculate realistic weight goal timeline
+        function calculateWeightTimeline(currentWeight, targetWeight, weightUnit) {
+            const weightDifference = Math.abs(currentWeight - targetWeight);
+            const weightDifferenceKg = weightUnit === 'lbs' ? weightDifference * 0.453592 : weightDifference;
+            
+            // Realistic weight change rates
+            const weeklyLossRate = 0.5; // 0.5 kg per week for weight loss
+            const weeklyGainRate = 0.25; // 0.25 kg per week for weight gain
+            const isWeightLoss = currentWeight > targetWeight;
+            
+            const weeklyRate = isWeightLoss ? weeklyLossRate : weeklyGainRate;
+            const weeksNeeded = Math.ceil(weightDifferenceKg / weeklyRate);
+            
+            // Generate weekly milestones
+            const milestones = [];
+            const weeklyChange = weightUnit === 'lbs' ? 
+                (weeklyRate * 2.20462) : weeklyRate;
+            
+            for (let week = 1; week <= Math.min(weeksNeeded, 12); week++) {
+                const progressWeight = isWeightLoss ? 
+                    currentWeight - (weeklyChange * week) :
+                    currentWeight + (weeklyChange * week);
+                
+                milestones.push({
+                    week: week,
+                    targetWeight: Math.round(progressWeight * 10) / 10,
+                    unit: weightUnit,
+                    progress: Math.min((week / weeksNeeded) * 100, 100)
+                });
+            }
+            
+            return {
+                totalWeeks: weeksNeeded,
+                weeklyRate: weeklyChange,
+                isWeightLoss: isWeightLoss,
+                milestones: milestones,
+                timeline: weeksNeeded <= 4 ? 'Short-term (1-4 weeks)' :
+                         weeksNeeded <= 12 ? 'Medium-term (1-3 months)' :
+                         weeksNeeded <= 24 ? 'Long-term (3-6 months)' : 'Extended (6+ months)'
+            };
+        }
+
         // Trigger Weekly Workflow
         function triggerWorkflow() {
             const weight = parseFloat(document.getElementById('weight').value);
@@ -729,6 +1020,24 @@
             document.getElementById('bmiCategory').textContent = bmiCategory;
             document.getElementById('bmiDisplay').style.display = 'block';
             
+            // Automatically generate healthy weight goal
+            const healthyGoal = generateHealthyWeightGoal(bmi, weight, weightUnit, height, heightUnit);
+            userData.weightGoal = {
+                value: healthyGoal.weight,
+                unit: healthyGoal.unit,
+                reason: healthyGoal.reason,
+                targetBMI: healthyGoal.bmi,
+                isMaintenance: healthyGoal.isMaintenance
+            };
+            
+            // Generate personalized meal plan
+            const mealPlan = generatePersonalizedMealPlan(bmi, sleepHours, healthyGoal, weight);
+            userData.mealPlan = mealPlan;
+            
+            // Calculate realistic timeline
+            const timeline = calculateWeightTimeline(weight, healthyGoal.weight, weightUnit);
+            userData.timeline = timeline;
+            
             // Generate and display recommendations
             const dietRecs = generateDietRecommendations(bmi, sleepHours);
             const sleepRecs = generateSleepRecommendations(bmi, sleepHours);
@@ -743,18 +1052,11 @@
             document.getElementById('recommendations').style.display = 'block';
             document.getElementById('noDataMessage').style.display = 'none';
             
-            // Automatically generate healthy weight goal
-            const healthyGoal = generateHealthyWeightGoal(bmi, weight, weightUnit, height, heightUnit);
-            userData.weightGoal = {
-                value: healthyGoal.weight,
-                unit: healthyGoal.unit,
-                reason: healthyGoal.reason,
-                targetBMI: healthyGoal.bmi,
-                isMaintenance: healthyGoal.isMaintenance
-            };
-            
             // Update goal display
             updateGoalComparison();
+            
+            // Display meal plan
+            displayMealPlan();
             
             // Update goal input fields to show the generated goal
             document.getElementById('weightGoal').value = healthyGoal.weight;
@@ -766,11 +1068,17 @@
                     `Maintain current weight: ${healthyGoal.weight} ${healthyGoal.unit}` :
                     `Target weight: ${healthyGoal.weight} ${healthyGoal.unit} (${healthyGoal.reason})`;
                 
+                const timelineMessage = timeline.isWeightLoss ? 
+                    `Timeline: ${timeline.totalWeeks} weeks to lose ${Math.abs(weight - healthyGoal.weight).toFixed(1)} ${weightUnit}` :
+                    `Timeline: ${timeline.totalWeeks} weeks to gain ${Math.abs(weight - healthyGoal.weight).toFixed(1)} ${weightUnit}`;
+                
                 alert('✅ Weekly recommendations have been sent to your email!\n\n' +
                       `BMI: ${bmi.toFixed(1)} (${bmiCategory})\n` +
                       `Diet recommendations: ${dietRecs.length} items\n` +
                       `Sleep recommendations: ${sleepRecs.length} items\n` +
-                      `Weight goal: ${goalMessage}`);
+                      `Personalized meal plan: ${mealPlan.breakfast.length + mealPlan.lunch.length + mealPlan.dinner.length} meal options\n` +
+                      `Weight goal: ${goalMessage}\n` +
+                      `${timelineMessage}`);
             }, 1000);
             
             // Log workflow execution
@@ -850,6 +1158,74 @@
             reasonElement.innerHTML = `<strong>Goal Reason:</strong> ${goalReason}<br><strong>Target BMI:</strong> ${targetBMI.toFixed(1)}`;
             
             goalComparisonDiv.style.display = 'block';
+            
+            // Update timeline if available
+            if (userData.timeline) {
+                updateTimelineDisplay();
+            }
+        }
+
+        // Update Timeline Display
+        function updateTimelineDisplay() {
+            if (!userData.timeline) return;
+            
+            const timeline = userData.timeline;
+            const unit = userData.weightGoal.unit;
+            
+            document.getElementById('totalWeeks').textContent = timeline.totalWeeks;
+            document.getElementById('weeklyRate').textContent = `${timeline.weeklyRate.toFixed(1)} ${unit}/week`;
+            document.getElementById('timelineType').textContent = timeline.timeline;
+            
+            // Display milestones
+            const milestoneList = document.getElementById('milestoneList');
+            milestoneList.innerHTML = '';
+            
+            timeline.milestones.forEach(milestone => {
+                const milestoneDiv = document.createElement('div');
+                milestoneDiv.className = 'milestone-item';
+                milestoneDiv.innerHTML = `
+                    <span class="milestone-week">Week ${milestone.week}</span>
+                    <span class="milestone-weight">${milestone.targetWeight} ${milestone.unit}</span>
+                    <span class="milestone-progress">${milestone.progress.toFixed(0)}%</span>
+                `;
+                milestoneList.appendChild(milestoneDiv);
+            });
+            
+            document.getElementById('timelineSection').style.display = 'block';
+        }
+
+        // Display Meal Plan
+        function displayMealPlan() {
+            if (!userData.mealPlan) return;
+            
+            const mealPlan = userData.mealPlan;
+            
+            // Display breakfast options
+            document.getElementById('breakfastOptions').innerHTML = 
+                mealPlan.breakfast.map(option => `<div class="meal-option">${option}</div>`).join('');
+            
+            // Display lunch options
+            document.getElementById('lunchOptions').innerHTML = 
+                mealPlan.lunch.map(option => `<div class="meal-option">${option}</div>`).join('');
+            
+            // Display dinner options
+            document.getElementById('dinnerOptions').innerHTML = 
+                mealPlan.dinner.map(option => `<div class="meal-option">${option}</div>`).join('');
+            
+            // Display snack options
+            document.getElementById('snackOptions').innerHTML = 
+                mealPlan.snacks.map(option => `<div class="meal-option">${option}</div>`).join('');
+            
+            // Display hydration
+            document.getElementById('hydrationOptions').innerHTML = 
+                mealPlan.hydration.map(option => `<div class="meal-option">${option}</div>`).join('');
+            
+            // Display weekly target
+            document.getElementById('weeklyTargetText').textContent = mealPlan.weeklyTarget;
+            
+            // Show meal plan content
+            document.getElementById('mealPlanContent').style.display = 'block';
+            document.getElementById('noMealPlanMessage').style.display = 'none';
         }
 
         // Test Email Delivery
