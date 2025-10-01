@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Workflow Automation MVP</title>
+    <title>Health Tracker</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -37,68 +37,11 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .workflow-status {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 30px;
-            color: white;
-            text-align: center;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-active { background: #4CAF50; }
-        .status-pending { background: #FF9800; }
-        .status-inactive { background: #f44336; }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
+        .form {
             background: white;
             border-radius: 15px;
-            padding: 25px;
+            padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-icon {
-            font-size: 2rem;
-            margin-right: 15px;
-            color: #667eea;
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
         }
 
         .input-group {
@@ -112,8 +55,14 @@
             color: #555;
         }
 
-        .input-group input,
-        .input-group select {
+        .input-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+
+        .form input,
+        .form select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -122,147 +71,37 @@
             transition: border-color 0.3s ease;
         }
 
-        .input-group input:focus,
-        .input-group select:focus {
+        .form input:focus,
+        .form select:focus {
             outline: none;
             border-color: #667eea;
         }
 
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
         .btn {
+            width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 15px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            width: 100%;
+            transition: transform 0.2s ease;
+            margin-bottom: 20px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .metric:last-child {
-            border-bottom: none;
-        }
-
-        .metric-label {
-            font-weight: 500;
-            color: #666;
-        }
-
-        .metric-value {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #333;
-        }
-
-        .goal-comparison {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .goal-current {
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .goal-target {
-            color: #28a745;
-            font-weight: 600;
-        }
-
-        .recommendations {
-            background: #e8f5e8;
-            border-left: 4px solid #28a745;
-            padding: 15px;
-            margin-top: 15px;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .recommendation-item {
-            margin-bottom: 10px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .recommendation-item:before {
-            content: "•";
-            color: #28a745;
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
-
-        .reminder-schedule {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin-top: 15px;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .reminder-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            padding: 8px 0;
-        }
-
-        .reminder-time {
-            font-weight: 600;
-            color: #856404;
-        }
-
-        .reminder-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-enabled {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-disabled {
-            background: #f8d7da;
-            color: #721c24;
+        .results {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            display: none;
         }
 
         .bmi-display {
@@ -285,106 +124,70 @@
             opacity: 0.9;
         }
 
-        .workflow-step {
-            display: flex;
-            align-items: center;
+        .recommendations {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 15px;
             margin-bottom: 15px;
-            padding: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .recommendation-item {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .recommendation-item:before {
+            content: "•";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .meal-plan {
             background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .step-number {
-            background: #667eea;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 15px;
-        }
-
-        .step-content {
-            flex: 1;
-        }
-
-        .step-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .step-description {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .meal-plan-section {
-            margin-bottom: 20px;
             padding: 15px;
-            background: #f8f9fa;
             border-radius: 8px;
+            margin-bottom: 15px;
         }
 
-        .meal-plan-section h4 {
+        .meal-plan h4 {
             color: #667eea;
             margin-bottom: 10px;
-            font-size: 1.1rem;
         }
 
         .meal-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
         }
 
         .meal-option {
             background: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             border-left: 3px solid #28a745;
             font-size: 0.9rem;
-            color: #333;
         }
 
-        .weekly-target {
-            background: #e8f5e8;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #28a745;
-            margin-top: 15px;
-        }
-
-        .weekly-target h4 {
-            color: #2d5a2d;
-            margin-bottom: 8px;
-        }
-
-        .weekly-target p {
-            color: #2d5a2d;
-            margin: 0;
-            font-weight: 500;
-        }
-
-        .timeline-section {
+        .timeline {
             background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
             border-left: 4px solid #ffc107;
-            margin-top: 15px;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
         }
 
-        .timeline-section h4 {
+        .timeline h4 {
             color: #856404;
             margin-bottom: 10px;
         }
 
         .timeline-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
             margin-bottom: 15px;
         }
 
@@ -407,44 +210,9 @@
             margin-top: 5px;
         }
 
-        .milestone-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .milestone-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .milestone-item:last-child {
-            border-bottom: none;
-        }
-
-        .milestone-week {
-            font-weight: 600;
-            color: #856404;
-        }
-
-        .milestone-weight {
-            color: #333;
-        }
-
-        .milestone-progress {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
-            }
-            
-            .dashboard {
-                grid-template-columns: 1fr;
             }
             
             .container {
@@ -460,209 +228,82 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-cogs"></i> Health Workflow Automation MVP</h1>
-            <p>Automated weekly health recommendations and goal tracking</p>
+            <h1><i class="fas fa-heartbeat"></i> Health Tracker</h1>
         </div>
 
-        <!-- Workflow Status -->
-        <div class="workflow-status">
-            <span class="status-indicator status-active"></span>
-            <strong>Workflow Status:</strong> Active - Ready for weekly data input and automated recommendations
+        <div class="form">
+            <div class="input-group">
+                <label for="weight">Weight</label>
+                <div class="input-row">
+                    <input type="number" id="weight" placeholder="Enter weight" step="0.1" min="0">
+                    <select id="weightUnit">
+                        <option value="kg">kg</option>
+                        <option value="lbs">lbs</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="height">Height</label>
+                <div class="input-row">
+                    <input type="number" id="height" placeholder="Enter height" step="0.1" min="0">
+                    <select id="heightUnit">
+                        <option value="cm">cm</option>
+                        <option value="in">in</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="sleepHours">Weekly Sleep Hours</label>
+                <input type="number" id="sleepHours" placeholder="e.g., 56" step="0.5" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="exerciseMinutes">Weekly Exercise Minutes</label>
+                <input type="number" id="exerciseMinutes" placeholder="e.g., 150 (0 if none)" step="1" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="weightGoal">Target Weight (Optional)</label>
+                <div class="input-row">
+                    <input type="number" id="weightGoal" placeholder="Enter target weight" step="0.1" min="0">
+                    <select id="goalUnit">
+                        <option value="kg">kg</option>
+                        <option value="lbs">lbs</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" onclick="generateRecommendations()">Generate Health Plan</button>
         </div>
 
-        <div class="dashboard">
-            <!-- Weekly Data Input Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-clipboard-list card-icon"></i>
-                    <h3 class="card-title">Weekly Data Input</h3>
-                </div>
-                
-                <div class="input-group">
-                    <label for="weight">Weight</label>
-                    <div class="input-row">
-                        <input type="number" id="weight" placeholder="Enter weight" step="0.1" min="0">
-                        <select id="weightUnit">
-                            <option value="kg">kg</option>
-                            <option value="lbs">lbs</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="height">Height</label>
-                    <div class="input-row">
-                        <input type="number" id="height" placeholder="Enter height" step="0.1" min="0">
-                        <select id="heightUnit">
-                            <option value="cm">cm</option>
-                            <option value="in">in</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="sleepHours">Total Weekly Sleep Hours</label>
-                    <input type="number" id="sleepHours" placeholder="e.g., 56" step="0.5" min="0">
-                </div>
-
-                <div class="input-group">
-                    <label for="exerciseMinutes">Total Weekly Exercise Minutes</label>
-                    <input type="number" id="exerciseMinutes" placeholder="e.g., 150 (0 if no exercise)" step="1" min="0">
-                </div>
-
-                <button class="btn btn-success" onclick="triggerWorkflow()">
-                    <i class="fas fa-play"></i> Trigger Weekly Workflow
-                </button>
+        <div class="results" id="results">
+            <div class="bmi-display" id="bmiDisplay">
+                <div class="bmi-value" id="bmiValue">--</div>
+                <div class="bmi-category" id="bmiCategory">Enter data to calculate</div>
             </div>
 
-            <!-- BMI & Recommendations Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-calculator card-icon"></i>
-                    <h3 class="card-title">BMI & Recommendations</h3>
-                </div>
-                
-                <div class="bmi-display" id="bmiDisplay" style="display: none;">
-                    <div class="bmi-value" id="bmiValue">--</div>
-                    <div class="bmi-category" id="bmiCategory">Enter data to calculate</div>
-                </div>
-
-                <div class="recommendations" id="recommendations" style="display: none;">
-                    <h4><i class="fas fa-lightbulb"></i> Automated Recommendations</h4>
-                    <div id="dietRecommendations"></div>
-                    <div id="sleepRecommendations"></div>
-                </div>
-
-                <div id="noDataMessage" style="text-align: center; color: #666; padding: 20px;">
-                    <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                    <p>Enter your weekly data to generate BMI and recommendations</p>
-                </div>
+            <div class="recommendations" id="recommendations">
+                <h4>Health Recommendations</h4>
+                <div id="dietRecommendations"></div>
+                <div id="sleepRecommendations"></div>
             </div>
 
-            <!-- Goal Tracking Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-target card-icon"></i>
-                    <h3 class="card-title">Flexible Weight Goal Tracking</h3>
-                </div>
-                
-                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
-                    <h4 style="color: #2d5a2d; margin-bottom: 10px;"><i class="fas fa-magic"></i> Flexible Goal Setting</h4>
-                    <p style="color: #2d5a2d; margin: 0; font-size: 0.9rem;">
-                        Set your own custom weight goal or use our smart BMI-based recommendation. 
-                        Both options will generate personalized meal plans and realistic timelines.
-                    </p>
-                </div>
-                
-                <div class="input-group">
-                    <label for="weightGoal">Custom Weight Goal (Optional)</label>
-                    <div class="input-row">
-                        <input type="number" id="weightGoal" placeholder="Enter custom target weight" step="0.1" min="0">
-                        <select id="goalUnit">
-                            <option value="kg">kg</option>
-                            <option value="lbs">lbs</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn btn-secondary" onclick="setCustomWeightGoal()" style="flex: 1;">
-                        <i class="fas fa-save"></i> Set Custom Goal
-                    </button>
-                    <button class="btn btn-success" onclick="useAutoWeightGoal()" style="flex: 1;">
-                        <i class="fas fa-magic"></i> Use Auto Goal
-                    </button>
-                </div>
-
-                <div class="goal-comparison" id="goalComparison" style="display: none;">
-                    <div class="metric">
-                        <span class="metric-label">Current Weight</span>
-                        <span class="metric-value goal-current" id="currentWeight">--</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Target Weight</span>
-                        <span class="metric-value goal-target" id="targetWeight">--</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Progress</span>
-                        <span class="metric-value" id="weightProgress">--</span>
-                    </div>
-                </div>
-
-                <div class="timeline-section" id="timelineSection" style="display: none;">
-                    <h4><i class="fas fa-calendar-alt"></i> Realistic Timeline</h4>
-                    <div class="timeline-info">
-                        <div class="timeline-item">
-                            <div class="timeline-value" id="totalWeeks">--</div>
-                            <div class="timeline-label">Total Weeks</div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-value" id="weeklyRate">--</div>
-                            <div class="timeline-label">Weekly Change</div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-value" id="timelineType">--</div>
-                            <div class="timeline-label">Timeline Type</div>
-                        </div>
-                    </div>
-                    <div class="milestone-list" id="milestoneList"></div>
-                </div>
+            <div class="meal-plan" id="mealPlan">
+                <h4>Meal Plan</h4>
+                <div id="mealPlanContent"></div>
             </div>
 
-            <!-- Personalized Meal Plan Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-utensils card-icon"></i>
-                    <h3 class="card-title">Personalized Meal Plan</h3>
-                </div>
-                
-                <div id="mealPlanContent" style="display: none;">
-                    <div class="meal-plan-section">
-                        <h4><i class="fas fa-sun"></i> Breakfast Options</h4>
-                        <div id="breakfastOptions" class="meal-options"></div>
-                    </div>
-                    
-                    <div class="meal-plan-section">
-                        <h4><i class="fas fa-sun"></i> Lunch Options</h4>
-                        <div id="lunchOptions" class="meal-options"></div>
-                    </div>
-                    
-                    <div class="meal-plan-section">
-                        <h4><i class="fas fa-moon"></i> Dinner Options</h4>
-                        <div id="dinnerOptions" class="meal-options"></div>
-                    </div>
-                    
-                    <div class="meal-plan-section">
-                        <h4><i class="fas fa-apple-alt"></i> Snack Options</h4>
-                        <div id="snackOptions" class="meal-options"></div>
-                    </div>
-                    
-                    <div class="meal-plan-section">
-                        <h4><i class="fas fa-tint"></i> Hydration</h4>
-                        <div id="hydrationOptions" class="meal-options"></div>
-                    </div>
-                    
-                    <div class="weekly-target">
-                        <h4><i class="fas fa-target"></i> Weekly Target</h4>
-                        <p id="weeklyTargetText"></p>
-                    </div>
-                </div>
-                
-                <div id="noMealPlanMessage" style="text-align: center; color: #666; padding: 20px;">
-                    <i class="fas fa-utensils" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                    <p>Enter your weekly data to generate a personalized meal plan</p>
-                </div>
-
-                <button class="btn" onclick="testEmailDelivery()">
-                    <i class="fas fa-envelope"></i> Test Email Delivery
-                </button>
+            <div class="timeline" id="timeline">
+                <h4>Weight Goal Timeline</h4>
+                <div id="timelineContent"></div>
             </div>
         </div>
-
     </div>
 
     <script>
-        // Health Workflow Automation MVP JavaScript
+        // Health Tracker JavaScript
         
         // Global state
         let userData = {
@@ -670,8 +311,7 @@
             height: null,
             sleepHours: null,
             exerciseMinutes: null,
-            weightGoal: null,
-            lastWorkflowRun: null
+            weightGoal: null
         };
 
         // BMI Calculation
@@ -679,7 +319,6 @@
             let weightKg = weight;
             let heightM = height;
             
-            // Convert to metric if needed
             if (weightUnit === 'lbs') {
                 weightKg = weight * 0.453592;
             }
@@ -700,118 +339,8 @@
             return 'Obese';
         }
 
-        // Generate Personalized Meal Plan based on BMI and goals
-        function generatePersonalizedMealPlan(bmi, sleepHours, weightGoal, currentWeight) {
-            const mealPlan = {
-                breakfast: [],
-                lunch: [],
-                dinner: [],
-                snacks: [],
-                hydration: [],
-                weeklyTarget: ''
-            };
-            
-            const isWeightLoss = weightGoal.isMaintenance === false && currentWeight > weightGoal.value;
-            const isWeightGain = weightGoal.isMaintenance === false && currentWeight < weightGoal.value;
-            
-            if (bmi < 18.5 || isWeightGain) {
-                // Weight gain meal plan
-                mealPlan.breakfast = [
-                    'Oatmeal with nuts, seeds, and dried fruit',
-                    'Greek yogurt with granola and berries',
-                    'Whole grain toast with avocado and eggs',
-                    'Smoothie with protein powder, banana, and nut butter'
-                ];
-                mealPlan.lunch = [
-                    'Quinoa bowl with chicken, vegetables, and tahini dressing',
-                    'Whole grain pasta with lean meat and vegetables',
-                    'Salmon salad with mixed greens and olive oil',
-                    'Bean and rice bowl with cheese and vegetables'
-                ];
-                mealPlan.dinner = [
-                    'Grilled chicken with sweet potato and steamed broccoli',
-                    'Baked fish with brown rice and roasted vegetables',
-                    'Lean beef stir-fry with brown rice noodles',
-                    'Turkey meatballs with whole wheat pasta and marinara'
-                ];
-                mealPlan.snacks = [
-                    'Mixed nuts and dried fruit',
-                    'Cheese and whole grain crackers',
-                    'Hummus with vegetables',
-                    'Greek yogurt with honey and granola'
-                ];
-                mealPlan.weeklyTarget = 'Increase caloric intake by 300-500 calories daily';
-                
-            } else if (bmi >= 18.5 && bmi < 25 && !isWeightLoss) {
-                // Maintenance meal plan
-                mealPlan.breakfast = [
-                    'Greek yogurt with berries and granola',
-                    'Whole grain cereal with milk and fruit',
-                    'Eggs with whole grain toast and vegetables',
-                    'Overnight oats with nuts and fruit'
-                ];
-                mealPlan.lunch = [
-                    'Grilled chicken salad with mixed vegetables',
-                    'Turkey and vegetable wrap with whole grain tortilla',
-                    'Quinoa bowl with vegetables and lean protein',
-                    'Lentil soup with whole grain bread'
-                ];
-                mealPlan.dinner = [
-                    'Baked salmon with roasted vegetables',
-                    'Grilled chicken with quinoa and steamed broccoli',
-                    'Vegetable stir-fry with tofu and brown rice',
-                    'Lean beef with sweet potato and green beans'
-                ];
-                mealPlan.snacks = [
-                    'Apple with almond butter',
-                    'Vegetable sticks with hummus',
-                    'Greek yogurt with berries',
-                    'Mixed nuts (small portion)'
-                ];
-                mealPlan.weeklyTarget = 'Maintain balanced nutrition with variety';
-                
-            } else if (bmi >= 25 || isWeightLoss) {
-                // Weight loss meal plan
-                mealPlan.breakfast = [
-                    'Greek yogurt with berries and chia seeds',
-                    'Vegetable omelet with whole grain toast',
-                    'Overnight oats with protein powder and fruit',
-                    'Smoothie bowl with spinach, berries, and protein'
-                ];
-                mealPlan.lunch = [
-                    'Large salad with lean protein and olive oil dressing',
-                    'Vegetable soup with grilled chicken',
-                    'Quinoa bowl with vegetables and light dressing',
-                    'Turkey and vegetable lettuce wraps'
-                ];
-                mealPlan.dinner = [
-                    'Grilled fish with steamed vegetables',
-                    'Baked chicken with roasted vegetables',
-                    'Vegetable stir-fry with lean protein',
-                    'Turkey meatballs with zucchini noodles'
-                ];
-                mealPlan.snacks = [
-                    'Celery with almond butter',
-                    'Greek yogurt with berries',
-                    'Vegetable sticks with hummus',
-                    'Apple slices with cinnamon'
-                ];
-                mealPlan.weeklyTarget = 'Create caloric deficit of 500-750 calories daily';
-            }
-            
-            // Hydration recommendations
-            mealPlan.hydration = [
-                'Drink 8-10 glasses of water daily',
-                'Start each meal with a glass of water',
-                'Limit sugary drinks and alcohol',
-                'Include herbal teas and sparkling water'
-            ];
-            
-            return mealPlan;
-        }
-
-        // Generate Diet Recommendations based on BMI
-        function generateDietRecommendations(bmi, sleepHours) {
+        // Generate Diet Recommendations
+        function generateDietRecommendations(bmi) {
             const recommendations = [];
             
             if (bmi < 18.5) {
@@ -835,7 +364,7 @@
             return recommendations;
         }
 
-        // Generate Sleep Recommendations based on BMI and sleep hours
+        // Generate Sleep Recommendations
         function generateSleepRecommendations(bmi, sleepHours) {
             const recommendations = [];
             const avgSleepPerNight = sleepHours / 7;
@@ -861,111 +390,65 @@
             return recommendations;
         }
 
-        // Generate Healthy Weight Goal based on BMI and current weight
-        function generateHealthyWeightGoal(bmi, currentWeight, weightUnit, height, heightUnit) {
-            let heightM = height;
-            let currentWeightKg = currentWeight;
-            
-            // Convert to metric for calculations
-            if (heightUnit === 'in') {
-                heightM = height * 0.0254;
-            } else if (heightUnit === 'cm') {
-                heightM = height / 100;
-            }
-            
-            if (weightUnit === 'lbs') {
-                currentWeightKg = currentWeight * 0.453592;
-            }
-            
-            let targetBMI;
-            let goalReason;
-            
-            if (bmi < 18.5) {
-                // Underweight - aim for lower end of normal range
-                targetBMI = 20.0;
-                goalReason = "Gain weight to reach healthy BMI range";
-            } else if (bmi >= 18.5 && bmi < 25) {
-                // Normal weight - maintain current range
-                targetBMI = bmi; // Keep current BMI
-                goalReason = "Maintain current healthy weight";
-            } else if (bmi >= 25 && bmi < 30) {
-                // Overweight - aim for upper end of normal range
-                targetBMI = 24.0;
-                goalReason = "Lose weight to reach healthy BMI range";
-            } else {
-                // Obese - aim for lower end of normal range
-                targetBMI = 22.0;
-                goalReason = "Lose weight to reach healthy BMI range";
-            }
-            
-            // Calculate target weight in kg
-            const targetWeightKg = targetBMI * (heightM * heightM);
-            
-            // Convert back to user's preferred unit
-            let targetWeight = targetWeightKg;
-            if (weightUnit === 'lbs') {
-                targetWeight = targetWeightKg * 2.20462;
-            }
-            
-            return {
-                weight: Math.round(targetWeight * 10) / 10, // Round to 1 decimal place
-                unit: weightUnit,
-                bmi: targetBMI,
-                reason: goalReason,
-                isMaintenance: bmi >= 18.5 && bmi < 25
+        // Generate Meal Plan
+        function generateMealPlan(bmi, weightGoal, currentWeight) {
+            const mealPlan = {
+                breakfast: [],
+                lunch: [],
+                dinner: [],
+                snacks: []
             };
+            
+            const isWeightLoss = weightGoal && currentWeight > weightGoal;
+            const isWeightGain = weightGoal && currentWeight < weightGoal;
+            
+            if (bmi < 18.5 || isWeightGain) {
+                mealPlan.breakfast = ['Oatmeal with nuts and berries', 'Greek yogurt with granola', 'Whole grain toast with avocado'];
+                mealPlan.lunch = ['Quinoa bowl with chicken', 'Salmon salad', 'Bean and rice bowl'];
+                mealPlan.dinner = ['Grilled chicken with sweet potato', 'Baked fish with rice', 'Lean beef stir-fry'];
+                mealPlan.snacks = ['Mixed nuts', 'Cheese and crackers', 'Hummus with vegetables'];
+            } else if (bmi >= 18.5 && bmi < 25 && !isWeightLoss) {
+                mealPlan.breakfast = ['Greek yogurt with berries', 'Whole grain cereal', 'Eggs with toast'];
+                mealPlan.lunch = ['Grilled chicken salad', 'Turkey wrap', 'Quinoa bowl'];
+                mealPlan.dinner = ['Baked salmon', 'Grilled chicken with quinoa', 'Vegetable stir-fry'];
+                mealPlan.snacks = ['Apple with almond butter', 'Vegetable sticks', 'Greek yogurt'];
+            } else {
+                mealPlan.breakfast = ['Greek yogurt with chia seeds', 'Vegetable omelet', 'Overnight oats'];
+                mealPlan.lunch = ['Large salad with protein', 'Vegetable soup', 'Quinoa bowl'];
+                mealPlan.dinner = ['Grilled fish', 'Baked chicken', 'Vegetable stir-fry'];
+                mealPlan.snacks = ['Celery with almond butter', 'Greek yogurt', 'Apple slices'];
+            }
+            
+            return mealPlan;
         }
 
-        // Calculate realistic weight goal timeline
-        function calculateWeightTimeline(currentWeight, targetWeight, weightUnit) {
+        // Calculate Timeline
+        function calculateTimeline(currentWeight, targetWeight, weightUnit) {
+            if (!targetWeight) return null;
+            
             const weightDifference = Math.abs(currentWeight - targetWeight);
             const weightDifferenceKg = weightUnit === 'lbs' ? weightDifference * 0.453592 : weightDifference;
             
-            // Realistic weight change rates
-            const weeklyLossRate = 0.5; // 0.5 kg per week for weight loss
-            const weeklyGainRate = 0.25; // 0.25 kg per week for weight gain
-            const isWeightLoss = currentWeight > targetWeight;
-            
-            const weeklyRate = isWeightLoss ? weeklyLossRate : weeklyGainRate;
+            const weeklyRate = 0.5; // 0.5 kg per week
             const weeksNeeded = Math.ceil(weightDifferenceKg / weeklyRate);
-            
-            // Generate weekly milestones
-            const milestones = [];
-            const weeklyChange = weightUnit === 'lbs' ? 
-                (weeklyRate * 2.20462) : weeklyRate;
-            
-            for (let week = 1; week <= Math.min(weeksNeeded, 12); week++) {
-                const progressWeight = isWeightLoss ? 
-                    currentWeight - (weeklyChange * week) :
-                    currentWeight + (weeklyChange * week);
-                
-                milestones.push({
-                    week: week,
-                    targetWeight: Math.round(progressWeight * 10) / 10,
-                    unit: weightUnit,
-                    progress: Math.min((week / weeksNeeded) * 100, 100)
-                });
-            }
             
             return {
                 totalWeeks: weeksNeeded,
-                weeklyRate: weeklyChange,
-                isWeightLoss: isWeightLoss,
-                milestones: milestones,
-                timeline: weeksNeeded <= 4 ? 'Short-term (1-4 weeks)' :
-                         weeksNeeded <= 12 ? 'Medium-term (1-3 months)' :
-                         weeksNeeded <= 24 ? 'Long-term (3-6 months)' : 'Extended (6+ months)'
+                weeklyRate: weightUnit === 'lbs' ? 1.1 : 0.5,
+                isWeightLoss: currentWeight > targetWeight
             };
         }
 
-        // Trigger Weekly Workflow
-        function triggerWorkflow() {
+        // Main function
+        function generateRecommendations() {
             const weight = parseFloat(document.getElementById('weight').value);
             const height = parseFloat(document.getElementById('height').value);
             const sleepHours = parseFloat(document.getElementById('sleepHours').value);
             const exerciseMinutes = parseFloat(document.getElementById('exerciseMinutes').value);
+            const weightGoal = parseFloat(document.getElementById('weightGoal').value);
             const weightUnit = document.getElementById('weightUnit').value;
             const heightUnit = document.getElementById('heightUnit').value;
+            const goalUnit = document.getElementById('goalUnit').value;
             
             // Validation
             if (!weight || !height || !sleepHours || exerciseMinutes === null || exerciseMinutes === undefined) {
@@ -974,21 +457,19 @@
             }
             
             if (weight < 0 || height < 0 || sleepHours < 0 || exerciseMinutes < 0) {
-                alert('Please enter valid non-negative values (all values must be 0 or greater)');
+                alert('Please enter valid non-negative values');
                 return;
             }
             
             if (weight === 0 || height === 0 || sleepHours === 0) {
-                alert('Weight, height, and sleep hours must be greater than 0 (exercise can be 0)');
+                alert('Weight, height, and sleep hours must be greater than 0');
                 return;
             }
             
-            // Store user data
-            userData.weight = weight;
-            userData.height = height;
-            userData.sleepHours = sleepHours;
-            userData.exerciseMinutes = exerciseMinutes;
-            userData.lastWorkflowRun = new Date();
+            if (weightGoal && weightGoal <= 0) {
+                alert('Weight goal must be greater than 0');
+                return;
+            }
             
             // Calculate BMI
             const bmi = calculateBMI(weight, height, weightUnit, heightUnit);
@@ -997,362 +478,59 @@
             // Display BMI
             document.getElementById('bmiValue').textContent = bmi.toFixed(1);
             document.getElementById('bmiCategory').textContent = bmiCategory;
-            document.getElementById('bmiDisplay').style.display = 'block';
             
-            // Automatically generate healthy weight goal
-            const healthyGoal = generateHealthyWeightGoal(bmi, weight, weightUnit, height, heightUnit);
-            userData.weightGoal = {
-                value: healthyGoal.weight,
-                unit: healthyGoal.unit,
-                reason: healthyGoal.reason,
-                targetBMI: healthyGoal.bmi,
-                isMaintenance: healthyGoal.isMaintenance,
-                isCustom: false
-            };
-            
-            // Generate personalized meal plan
-            const mealPlan = generatePersonalizedMealPlan(bmi, sleepHours, healthyGoal, weight);
-            userData.mealPlan = mealPlan;
-            
-            // Calculate realistic timeline
-            const timeline = calculateWeightTimeline(weight, healthyGoal.weight, weightUnit);
-            userData.timeline = timeline;
-            
-            // Generate and display recommendations
-            const dietRecs = generateDietRecommendations(bmi, sleepHours);
+            // Generate recommendations
+            const dietRecs = generateDietRecommendations(bmi);
             const sleepRecs = generateSleepRecommendations(bmi, sleepHours);
             
-            const dietHtml = '<h5>Diet Recommendations:</h5>' + 
-                dietRecs.map(rec => `<div class="recommendation-item">${rec}</div>`).join('');
-            const sleepHtml = '<h5>Sleep Recommendations:</h5>' + 
-                sleepRecs.map(rec => `<div class="recommendation-item">${rec}</div>`).join('');
+            document.getElementById('dietRecommendations').innerHTML = 
+                '<h5>Diet:</h5>' + dietRecs.map(rec => `<div class="recommendation-item">${rec}</div>`).join('');
+            document.getElementById('sleepRecommendations').innerHTML = 
+                '<h5>Sleep:</h5>' + sleepRecs.map(rec => `<div class="recommendation-item">${rec}</div>`).join('');
             
-            document.getElementById('dietRecommendations').innerHTML = dietHtml;
-            document.getElementById('sleepRecommendations').innerHTML = sleepHtml;
-            document.getElementById('recommendations').style.display = 'block';
-            document.getElementById('noDataMessage').style.display = 'none';
+            // Generate meal plan
+            const mealPlan = generateMealPlan(bmi, weightGoal, weight);
+            const mealPlanHtml = 
+                '<div class="meal-options">' + mealPlan.breakfast.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
+                '<h5>Lunch:</h5><div class="meal-options">' + mealPlan.lunch.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
+                '<h5>Dinner:</h5><div class="meal-options">' + mealPlan.dinner.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>' +
+                '<h5>Snacks:</h5><div class="meal-options">' + mealPlan.snacks.map(meal => `<div class="meal-option">${meal}</div>`).join('') + '</div>';
             
-            // Update goal display
-            updateGoalComparison();
+            document.getElementById('mealPlanContent').innerHTML = '<h5>Breakfast:</h5>' + mealPlanHtml;
             
-            // Display meal plan
-            displayMealPlan();
-            
-            // Update goal input fields to show the generated goal
-            document.getElementById('weightGoal').value = healthyGoal.weight;
-            document.getElementById('goalUnit').value = healthyGoal.unit;
-            
-            // Simulate email delivery
-            setTimeout(() => {
-                const goalMessage = healthyGoal.isMaintenance ? 
-                    `Maintain current weight: ${healthyGoal.weight} ${healthyGoal.unit}` :
-                    `Target weight: ${healthyGoal.weight} ${healthyGoal.unit} (${healthyGoal.reason})`;
+            // Generate timeline
+            if (weightGoal) {
+                const timeline = calculateTimeline(weight, weightGoal, weightUnit);
+                const timelineHtml = 
+                    `<div class="timeline-info">
+                        <div class="timeline-item">
+                            <div class="timeline-value">${timeline.totalWeeks}</div>
+                            <div class="timeline-label">Total Weeks</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-value">${timeline.weeklyRate}</div>
+                            <div class="timeline-label">Weekly Change (${weightUnit})</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-value">${timeline.isWeightLoss ? 'Lose' : 'Gain'}</div>
+                            <div class="timeline-label">Goal Type</div>
+                        </div>
+                    </div>`;
                 
-                const timelineMessage = timeline.isWeightLoss ? 
-                    `Timeline: ${timeline.totalWeeks} weeks to lose ${Math.abs(weight - healthyGoal.weight).toFixed(1)} ${weightUnit}` :
-                    `Timeline: ${timeline.totalWeeks} weeks to gain ${Math.abs(weight - healthyGoal.weight).toFixed(1)} ${weightUnit}`;
-                
-                alert('✅ Weekly recommendations have been sent to your email!\n\n' +
-                      `BMI: ${bmi.toFixed(1)} (${bmiCategory})\n` +
-                      `Diet recommendations: ${dietRecs.length} items\n` +
-                      `Sleep recommendations: ${sleepRecs.length} items\n` +
-                      `Personalized meal plan: ${mealPlan.breakfast.length + mealPlan.lunch.length + mealPlan.dinner.length} meal options\n` +
-                      `Weight goal: ${goalMessage}\n` +
-                      `${timelineMessage}`);
-            }, 1000);
-            
-            // Log workflow execution
-            console.log('Workflow triggered:', {
-                timestamp: new Date().toISOString(),
-                bmi: bmi.toFixed(1),
-                category: bmiCategory,
-                dietRecommendations: dietRecs.length,
-                sleepRecommendations: sleepRecs.length
-            });
-        }
-
-        // Set Custom Weight Goal
-        function setCustomWeightGoal() {
-            const goal = parseFloat(document.getElementById('weightGoal').value);
-            const unit = document.getElementById('goalUnit').value;
-            
-            if (!goal || goal < 0) {
-                alert('Please enter a valid non-negative weight goal');
-                return;
-            }
-            
-            if (goal === 0) {
-                alert('Weight goal must be greater than 0');
-                return;
-            }
-            
-            if (!userData.weight) {
-                alert('Please enter your current weight first by running the weekly workflow');
-                return;
-            }
-            
-            // Calculate BMI for the custom goal to determine if it's reasonable
-            const currentWeight = userData.weight;
-            const height = userData.height;
-            const heightUnit = document.getElementById('heightUnit').value;
-            const weightUnit = document.getElementById('weightUnit').value;
-            
-            // Convert to metric for BMI calculation
-            let heightM = height;
-            let goalKg = goal;
-            let currentWeightKg = currentWeight;
-            
-            if (heightUnit === 'in') {
-                heightM = height * 0.0254;
-            } else if (heightUnit === 'cm') {
-                heightM = height / 100;
-            }
-            
-            if (unit === 'lbs') {
-                goalKg = goal * 0.453592;
-            }
-            if (weightUnit === 'lbs') {
-                currentWeightKg = currentWeight * 0.453592;
-            }
-            
-            const goalBMI = goalKg / (heightM * heightM);
-            
-            // Check if goal BMI is within reasonable range
-            if (goalBMI < 16 || goalBMI > 40) {
-                const confirmUnusual = confirm(
-                    `Warning: This goal would result in a BMI of ${goalBMI.toFixed(1)}, which is outside the typical healthy range (18.5-24.9).\n\n` +
-                    `Are you sure you want to set this goal? Consider consulting a healthcare provider.`
-                );
-                if (!confirmUnusual) {
-                    return;
-                }
-            }
-            
-            userData.weightGoal = { 
-                value: goal, 
-                unit: unit,
-                reason: "Custom user-defined goal",
-                targetBMI: goalBMI,
-                isMaintenance: false,
-                isCustom: true
-            };
-            
-            // Generate new meal plan and timeline based on custom goal
-            if (userData.weight && userData.height && userData.sleepHours) {
-                const bmi = calculateBMI(userData.weight, userData.height, weightUnit, heightUnit);
-                const mealPlan = generatePersonalizedMealPlan(bmi, userData.sleepHours, userData.weightGoal, userData.weight);
-                const timeline = calculateWeightTimeline(userData.weight, goal, unit);
-                
-                userData.mealPlan = mealPlan;
-                userData.timeline = timeline;
-                
-                // Update displays
-                updateGoalComparison();
-                displayMealPlan();
-            }
-            
-            alert(`Custom weight goal set: ${goal} ${unit} (BMI: ${goalBMI.toFixed(1)})`);
-        }
-
-        // Use Auto-Generated Weight Goal
-        function useAutoWeightGoal() {
-            if (!userData.weight || !userData.height) {
-                alert('Please enter your weight and height first by running the weekly workflow');
-                return;
-            }
-            
-            const weight = userData.weight;
-            const height = userData.height;
-            const weightUnit = document.getElementById('weightUnit').value;
-            const heightUnit = document.getElementById('heightUnit').value;
-            
-            // Generate automatic goal
-            const bmi = calculateBMI(weight, height, weightUnit, heightUnit);
-            const healthyGoal = generateHealthyWeightGoal(bmi, weight, weightUnit, height, heightUnit);
-            
-            // Set the goal
-            userData.weightGoal = {
-                value: healthyGoal.weight,
-                unit: healthyGoal.unit,
-                reason: healthyGoal.reason,
-                targetBMI: healthyGoal.bmi,
-                isMaintenance: healthyGoal.isMaintenance,
-                isCustom: false
-            };
-            
-            // Update input fields
-            document.getElementById('weightGoal').value = healthyGoal.weight;
-            document.getElementById('goalUnit').value = healthyGoal.unit;
-            
-            // Generate new meal plan and timeline
-            if (userData.sleepHours) {
-                const mealPlan = generatePersonalizedMealPlan(bmi, userData.sleepHours, userData.weightGoal, weight);
-                const timeline = calculateWeightTimeline(weight, healthyGoal.weight, weightUnit);
-                
-                userData.mealPlan = mealPlan;
-                userData.timeline = timeline;
-                
-                // Update displays
-                updateGoalComparison();
-                displayMealPlan();
-            }
-            
-            alert(`Auto-generated weight goal set: ${healthyGoal.weight} ${healthyGoal.unit} (BMI: ${healthyGoal.bmi.toFixed(1)})`);
-        }
-
-        // Update Goal Comparison
-        function updateGoalComparison() {
-            if (!userData.weightGoal || !userData.weight) return;
-            
-            const currentWeight = userData.weight;
-            const targetWeight = userData.weightGoal.value;
-            const currentUnit = document.getElementById('weightUnit').value;
-            const targetUnit = userData.weightGoal.unit;
-            const goalReason = userData.weightGoal.reason;
-            const targetBMI = userData.weightGoal.targetBMI;
-            const isMaintenance = userData.weightGoal.isMaintenance;
-            
-            // Convert to same unit for comparison
-            let currentDisplay = currentWeight;
-            let targetDisplay = targetWeight;
-            
-            if (currentUnit !== targetUnit) {
-                if (currentUnit === 'kg' && targetUnit === 'lbs') {
-                    targetDisplay = targetWeight * 2.20462;
-                } else if (currentUnit === 'lbs' && targetUnit === 'kg') {
-                    targetDisplay = targetWeight * 0.453592;
-                }
-            }
-            
-            const difference = currentDisplay - targetDisplay;
-            let progress;
-            
-            if (isMaintenance) {
-                progress = `Maintain current healthy weight (BMI: ${targetBMI.toFixed(1)})`;
+                document.getElementById('timelineContent').innerHTML = timelineHtml;
             } else {
-                progress = difference > 0 ? 
-                    `${difference.toFixed(1)} ${currentUnit} to lose` : 
-                    `${Math.abs(difference).toFixed(1)} ${currentUnit} to gain`;
+                document.getElementById('timelineContent').innerHTML = '<p>Set a target weight to see timeline</p>';
             }
             
-            document.getElementById('currentWeight').textContent = `${currentWeight} ${currentUnit}`;
-            document.getElementById('targetWeight').textContent = `${targetWeight} ${targetUnit}`;
-            document.getElementById('weightProgress').textContent = progress;
+            // Show results
+            document.getElementById('results').style.display = 'block';
             
-            // Add goal reason to the display
-            const goalComparisonDiv = document.getElementById('goalComparison');
-            let reasonElement = document.getElementById('goalReason');
-            if (!reasonElement) {
-                reasonElement = document.createElement('div');
-                reasonElement.id = 'goalReason';
-                reasonElement.style.cssText = 'margin-top: 10px; padding: 10px; background: #e8f5e8; border-radius: 5px; font-size: 0.9rem; color: #2d5a2d;';
-                goalComparisonDiv.appendChild(reasonElement);
-            }
-            const goalType = userData.weightGoal.isCustom ? 'Custom Goal' : 'Auto-Generated Goal';
-            reasonElement.innerHTML = `<strong>Goal Type:</strong> ${goalType}<br><strong>Goal Reason:</strong> ${goalReason}<br><strong>Target BMI:</strong> ${targetBMI.toFixed(1)}`;
-            
-            goalComparisonDiv.style.display = 'block';
-            
-            // Update timeline if available
-            if (userData.timeline) {
-                updateTimelineDisplay();
-            }
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Update Timeline Display
-        function updateTimelineDisplay() {
-            if (!userData.timeline) return;
-            
-            const timeline = userData.timeline;
-            const unit = userData.weightGoal.unit;
-            
-            document.getElementById('totalWeeks').textContent = timeline.totalWeeks;
-            document.getElementById('weeklyRate').textContent = `${timeline.weeklyRate.toFixed(1)} ${unit}/week`;
-            document.getElementById('timelineType').textContent = timeline.timeline;
-            
-            // Display milestones
-            const milestoneList = document.getElementById('milestoneList');
-            milestoneList.innerHTML = '';
-            
-            timeline.milestones.forEach(milestone => {
-                const milestoneDiv = document.createElement('div');
-                milestoneDiv.className = 'milestone-item';
-                milestoneDiv.innerHTML = `
-                    <span class="milestone-week">Week ${milestone.week}</span>
-                    <span class="milestone-weight">${milestone.targetWeight} ${milestone.unit}</span>
-                    <span class="milestone-progress">${milestone.progress.toFixed(0)}%</span>
-                `;
-                milestoneList.appendChild(milestoneDiv);
-            });
-            
-            document.getElementById('timelineSection').style.display = 'block';
-        }
-
-        // Display Meal Plan
-        function displayMealPlan() {
-            if (!userData.mealPlan) return;
-            
-            const mealPlan = userData.mealPlan;
-            
-            // Display breakfast options
-            document.getElementById('breakfastOptions').innerHTML = 
-                mealPlan.breakfast.map(option => `<div class="meal-option">${option}</div>`).join('');
-            
-            // Display lunch options
-            document.getElementById('lunchOptions').innerHTML = 
-                mealPlan.lunch.map(option => `<div class="meal-option">${option}</div>`).join('');
-            
-            // Display dinner options
-            document.getElementById('dinnerOptions').innerHTML = 
-                mealPlan.dinner.map(option => `<div class="meal-option">${option}</div>`).join('');
-            
-            // Display snack options
-            document.getElementById('snackOptions').innerHTML = 
-                mealPlan.snacks.map(option => `<div class="meal-option">${option}</div>`).join('');
-            
-            // Display hydration
-            document.getElementById('hydrationOptions').innerHTML = 
-                mealPlan.hydration.map(option => `<div class="meal-option">${option}</div>`).join('');
-            
-            // Display weekly target
-            document.getElementById('weeklyTargetText').textContent = mealPlan.weeklyTarget;
-            
-            // Show meal plan content
-            document.getElementById('mealPlanContent').style.display = 'block';
-            document.getElementById('noMealPlanMessage').style.display = 'none';
-        }
-
-        // Test Email Delivery
-        function testEmailDelivery() {
-            if (!userData.lastWorkflowRun) {
-                alert('Please run the weekly workflow first to test email delivery');
-                return;
-            }
-            
-            alert('📧 Test email sent!\n\n' +
-                  'In a real implementation, this would:\n' +
-                  '• Send personalized recommendations to your email\n' +
-                  '• Include BMI calculation and category\n' +
-                  '• Provide actionable diet and sleep advice\n' +
-                  '• Be triggered automatically every Sunday at 9:00 AM');
-        }
-
-        // Initialize reminder schedule
-        function initializeReminders() {
-            const now = new Date();
-            const nextSunday = new Date(now);
-            nextSunday.setDate(now.getDate() + (7 - now.getDay()) % 7);
-            nextSunday.setHours(9, 0, 0, 0);
-            
-            document.getElementById('nextTrigger').textContent = 
-                nextSunday.toLocaleDateString() + ' ' + nextSunday.toLocaleTimeString();
-        }
-
-        // Initialize on page load
+        // Auto-sync units
         document.addEventListener('DOMContentLoaded', function() {
-            initializeReminders();
-            
-            // Auto-sync units
             document.getElementById('weightUnit').addEventListener('change', function() {
                 document.getElementById('goalUnit').value = this.value;
             });
@@ -1361,20 +539,6 @@
                 document.getElementById('weightUnit').value = this.value;
             });
         });
-
-        // Simulate automated reminders (for demo purposes)
-        function simulateReminder(type) {
-            const messages = {
-                breakfast: '🍳 Good morning! Time for breakfast - fuel your day with a nutritious meal.',
-                lunch: '🥗 Lunch time! Remember to include vegetables and lean protein.',
-                dinner: '🍽️ Dinner time! Keep portions balanced and avoid eating too close to bedtime.',
-                activity: '🏃‍♂️ Time for your daily activity! Even 15 minutes of movement counts.',
-                sleep: '😴 Wind down time! Start your bedtime routine for better sleep quality.',
-                weekly: '📊 Weekly check-in time! Please submit your health data for personalized recommendations.'
-            };
-            
-            alert(messages[type] || 'Reminder: ' + type);
-        }
     </script>
 </body>
 </html>
