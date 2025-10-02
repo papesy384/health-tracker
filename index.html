@@ -565,6 +565,27 @@
             text-decoration: underline;
         }
 
+        /* Demo Credentials Styles */
+        .demo-credentials {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .demo-credentials p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .demo-credentials p:first-child {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -632,6 +653,13 @@
 
                     <div class="auth-footer">
                         <p><a href="#" onclick="showForgotPassword()">Forgot your password?</a></p>
+                        <div class="demo-credentials">
+                            <p><strong>Demo Accounts:</strong></p>
+                            <p>admin / HealthTrack2024!</p>
+                            <p>user / WeightLoss123!</p>
+                            <p>demo / DemoPass456!</p>
+                            <p>test@example.com / TestUser789!</p>
+                        </div>
                     </div>
                 </div>
 
@@ -868,6 +896,8 @@
             const password = document.getElementById('loginPassword').value.trim();
             const rememberMe = document.getElementById('rememberMe').checked;
             
+            console.log('Login details:', { email, password: password ? '***' : 'empty', rememberMe });
+            
             // Basic validation
             if (!email || !password) {
                 alert('Please enter both email/user ID and password');
@@ -891,7 +921,7 @@
                 showMainApp();
             } else {
                 console.log('Login failed');
-                alert('Invalid credentials. Please try again.');
+                alert('Invalid credentials. Please try again.\n\nDemo accounts:\n• admin / HealthTrack2024!\n• user / WeightLoss123!\n• demo / DemoPass456!\n• test@example.com / TestUser789!');
             }
         }
         
