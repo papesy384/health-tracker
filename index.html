@@ -1073,15 +1073,15 @@
             // Hide home page section
             document.getElementById('homePageSection').style.display = 'none';
             
-            // Show auth section
-            document.getElementById('authSection').style.display = 'block';
+            // Show main app section directly
+            document.getElementById('mainAppSection').style.display = 'block';
         }
         
         function showMainApp() {
             console.log('Showing main app');
             
-            // Hide auth section
-            document.getElementById('authSection').style.display = 'none';
+            // Hide home page section
+            document.getElementById('homePageSection').style.display = 'none';
             
             // Show main app section
             document.getElementById('mainAppSection').style.display = 'block';
@@ -1118,21 +1118,27 @@
             // Show home page section
             document.getElementById('homePageSection').style.display = 'block';
             
-            // Hide auth section
-            document.getElementById('authSection').style.display = 'none';
+            // Clear form fields (if they exist)
+            const loginEmail = document.getElementById('loginEmail');
+            const loginPassword = document.getElementById('loginPassword');
+            const rememberMe = document.getElementById('rememberMe');
             
-            // Clear form fields
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('rememberMe').checked = false;
-            document.getElementById('signupName').value = '';
-            document.getElementById('signupEmail').value = '';
-            document.getElementById('signupPassword').value = '';
-            document.getElementById('signupConfirmPassword').value = '';
-            document.getElementById('agreeTerms').checked = false;
+            if (loginEmail) loginEmail.value = '';
+            if (loginPassword) loginPassword.value = '';
+            if (rememberMe) rememberMe.checked = false;
             
-            // Switch to sign in tab
-            switchTab('signIn');
+            // Clear signup form fields (if they exist)
+            const signupName = document.getElementById('signupName');
+            const signupEmail = document.getElementById('signupEmail');
+            const signupPassword = document.getElementById('signupPassword');
+            const signupConfirmPassword = document.getElementById('signupConfirmPassword');
+            const agreeTerms = document.getElementById('agreeTerms');
+            
+            if (signupName) signupName.value = '';
+            if (signupEmail) signupEmail.value = '';
+            if (signupPassword) signupPassword.value = '';
+            if (signupConfirmPassword) signupConfirmPassword.value = '';
+            if (agreeTerms) agreeTerms.checked = false;
             
             console.log('Logged out successfully');
         }
