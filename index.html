@@ -1241,8 +1241,9 @@
                 const emailSent = await sendDirectEmail(userData.email, emailContent);
                 
                 if (emailSent) {
-                    alert('✅ Email sent successfully!\n\nYour health report has been delivered to your inbox.\n\nPlease check your email (including spam folder).');
-                    console.log('Email sent successfully');
+                    console.log('Email sent successfully to:', userData.email);
+                    // Show subtle success indicator
+                    showEmailSuccessIndicator();
                 } else {
                     throw new Error('Direct email sending failed');
                 }
@@ -1258,11 +1259,11 @@
                     window.open(mailtoLink);
                     copyReportToClipboard(emailContent);
                     
-                    alert('📧 Email client opened with your health report!\n\nIf your email client didn\'t open, the report has been copied to your clipboard.\n\nPlease send the email to receive your health report.');
+                    console.log('Email client opened as fallback');
                 } catch (fallbackError) {
                     console.error('Fallback also failed:', fallbackError);
                     copyReportToClipboard(emailContent);
-                    alert('📋 Email sending failed.\n\nYour health report has been copied to your clipboard.\n\nYou can paste it into any email application.');
+                    console.log('Report copied to clipboard as final fallback');
                 }
             } finally {
                 // Restore button
@@ -1430,6 +1431,54 @@
             });
         }
         
+        // Show subtle email success indicator
+        function showEmailSuccessIndicator() {
+            // Create a subtle success message
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideInRight 0.3s ease-out;
+            `;
+            successDiv.innerHTML = '✅ Email sent successfully!';
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to page
+            document.body.appendChild(successDiv);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                successDiv.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.parentNode.removeChild(successDiv);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
         // Copy report to clipboard
         function copyReportToClipboard(content) {
             try {
