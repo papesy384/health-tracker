@@ -1161,18 +1161,72 @@
             emailContent += `\nSnack Options:\n`;
             mealPlan.snacks.forEach(meal => emailContent += `• ${meal}\n`);
             
-            // Create mailto link
-            const subject = encodeURIComponent('Your Health Report - Weight Tracking');
-            const body = encodeURIComponent(emailContent);
-            const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
+            // Try to open email client
+            try {
+                // Create mailto link
+                const subject = encodeURIComponent('Your Health Report - Weight Tracking');
+                const body = encodeURIComponent(emailContent);
+                const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
+                
+                // Open email client
+                window.open(mailtoLink);
+                
+                // Show success message
+                alert('✅ Email client opened with your health report!\n\nIf your email client didn\'t open, the report has been copied to your clipboard.\n\nPlease send the email to receive your health report.');
+                
+                // Copy to clipboard as backup
+                copyReportToClipboard(emailContent);
+                
+                console.log('Email client opened successfully');
+            } catch (error) {
+                console.error('Error opening email client:', error);
+                
+                // Fallback: copy to clipboard
+                copyReportToClipboard(emailContent);
+                alert('📋 Email client could not be opened.\n\nYour health report has been copied to your clipboard.\n\nYou can paste it into any email application.');
+            }
+        }
+        
+        // Copy report to clipboard
+        function copyReportToClipboard(content) {
+            try {
+                navigator.clipboard.writeText(content).then(function() {
+                    console.log('Report copied to clipboard successfully');
+                }).catch(function(err) {
+                    console.error('Could not copy to clipboard:', err);
+                    // Fallback for older browsers
+                    fallbackCopyTextToClipboard(content);
+                });
+            } catch (error) {
+                console.error('Clipboard API not available:', error);
+                fallbackCopyTextToClipboard(content);
+            }
+        }
+        
+        // Fallback copy method for older browsers
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
             
-            // Open email client
-            window.open(mailtoLink);
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
             
-            // Show success message
-            alert('Email client opened with your health report. Please send the email to receive your report.');
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    console.log('Fallback: Report copied to clipboard');
+                } else {
+                    console.error('Fallback: Unable to copy');
+                }
+            } catch (err) {
+                console.error('Fallback: Unable to copy', err);
+            }
             
-            console.log('Email client opened successfully');
+            document.body.removeChild(textArea);
         }
 
         // Try multiple email services
