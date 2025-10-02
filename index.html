@@ -1121,7 +1121,8 @@
         }
 
         // Send email automatically using multiple services
-        async function sendEmailAutomatically() {
+        // Send email report automatically
+        function sendEmailAutomatically() {
             console.log('📧 sendEmailAutomatically called');
             
             // Check if we have current report
@@ -1136,25 +1137,42 @@
                 return;
             }
             
-            // Show loading state
-            setEmailStatus('loading', 'Sending email automatically...');
-            setButtonLoading(true);
-            
             const { bmi, bmiCategory, dietRecs, sleepRecs, mealPlan } = currentReport;
-            const emailContent = generateEmailContent(bmi, bmiCategory, dietRecs, sleepRecs, mealPlan);
             
-            // Try multiple email services
-            const emailSent = await tryEmailServices(userData.email, emailContent);
+            // Generate email content
+            let emailContent = `Your Health Report\n\n`;
+            emailContent += `BMI: ${bmi.toFixed(1)} (${bmiCategory})\n\n`;
             
-            if (emailSent) {
-                setEmailStatus('success', '✅ Email sent successfully! Check your inbox.');
-                showNotification('📧 Email sent automatically! Check your inbox.');
-            } else {
-                setEmailStatus('error', '❌ Failed to send email automatically. Please try the manual options below.');
-                showNotification('❌ Email sending failed. Please try manual options.');
-            }
+            emailContent += `Diet Recommendations:\n`;
+            dietRecs.forEach(rec => emailContent += `• ${rec}\n`);
+            emailContent += `\n`;
             
-            setButtonLoading(false);
+            emailContent += `Sleep Recommendations:\n`;
+            sleepRecs.forEach(rec => emailContent += `• ${rec}\n`);
+            emailContent += `\n`;
+            
+            emailContent += `Meal Plan:\n`;
+            emailContent += `Breakfast Options:\n`;
+            mealPlan.breakfast.forEach(meal => emailContent += `• ${meal}\n`);
+            emailContent += `\nLunch Options:\n`;
+            mealPlan.lunch.forEach(meal => emailContent += `• ${meal}\n`);
+            emailContent += `\nDinner Options:\n`;
+            mealPlan.dinner.forEach(meal => emailContent += `• ${meal}\n`);
+            emailContent += `\nSnack Options:\n`;
+            mealPlan.snacks.forEach(meal => emailContent += `• ${meal}\n`);
+            
+            // Create mailto link
+            const subject = encodeURIComponent('Your Health Report - Weight Tracking');
+            const body = encodeURIComponent(emailContent);
+            const mailtoLink = `mailto:${userData.email}?subject=${subject}&body=${body}`;
+            
+            // Open email client
+            window.open(mailtoLink);
+            
+            // Show success message
+            alert('Email client opened with your health report. Please send the email to receive your report.');
+            
+            console.log('Email client opened successfully');
         }
 
         // Try multiple email services
