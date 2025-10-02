@@ -584,10 +584,6 @@
             display: block;
         }
 
-        #authSection {
-            display: none;
-        }
-
 
         .home-content {
             text-align: center;
@@ -707,7 +703,7 @@
                             <span>Direct Email Reports</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="showSignIn()">
+                    <button class="btn btn-primary" onclick="showMainApp()">
                         <i class="fas fa-rocket"></i> Get Started
                     </button>
                 </div>
@@ -715,101 +711,6 @@
         </div>
 
 
-        <!-- Authentication Section -->
-        <div id="authSection" style="display: none;">
-            <div class="form">
-                <div class="auth-header">
-                    <p>Sign in to your account or create a new one</p>
-                </div>
-
-                <!-- Auth Tabs -->
-                <div class="auth-tabs">
-                    <button class="tab-btn active" id="signInTab" onclick="switchTab('signIn')">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
-                    </button>
-                    <button class="tab-btn" id="signUpTab" onclick="switchTab('signUp')">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </button>
-                </div>
-
-                <!-- Sign In Form -->
-                <div id="signInForm" class="auth-form active">
-                    <div class="input-group">
-                        <label for="loginEmail">Email or User ID</label>
-                        <input type="text" id="loginEmail" placeholder="Enter your email or user ID">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="loginPassword">Password</label>
-                        <div class="password-container">
-                            <input type="password" id="loginPassword" placeholder="Enter your password">
-                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
-                                <i class="fas fa-eye" id="loginPasswordIcon"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="rememberMe">
-                        <label for="rememberMe">Remember me</label>
-                    </div>
-
-                    <button class="btn" onclick="performLogin()">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
-                    </button>
-
-                    <div class="auth-footer">
-                        <p><a href="#" onclick="showForgotPassword()">Forgot your password?</a></p>
-                    </div>
-                </div>
-
-                <!-- Sign Up Form -->
-                <div id="signUpForm" class="auth-form">
-                    <div class="input-group">
-                        <label for="signupName">Full Name</label>
-                        <input type="text" id="signupName" placeholder="Enter your full name">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="signupEmail">Email Address</label>
-                        <input type="email" id="signupEmail" placeholder="Enter your email address">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="signupPassword">Password</label>
-                        <div class="password-container">
-                            <input type="password" id="signupPassword" placeholder="Create a password">
-                            <button type="button" class="password-toggle" onclick="togglePassword('signupPassword')">
-                                <i class="fas fa-eye" id="signupPasswordIcon"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="signupConfirmPassword">Confirm Password</label>
-                        <div class="password-container">
-                            <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
-                            <button type="button" class="password-toggle" onclick="togglePassword('signupConfirmPassword')">
-                                <i class="fas fa-eye" id="signupConfirmPasswordIcon"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="agreeTerms">
-                        <label for="agreeTerms">I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#" onclick="showPrivacy()">Privacy Policy</a></label>
-                    </div>
-
-                    <button class="btn" onclick="performSignup()">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </button>
-
-                    <div class="auth-footer">
-                        <p>Already have an account? <a href="#" onclick="switchTab('signIn')">Sign in here</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Main Application Section -->
         <div id="mainAppSection" style="display: none;">
