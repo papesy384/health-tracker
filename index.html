@@ -677,6 +677,36 @@
         .btn-primary i {
             margin-right: 10px;
         }
+
+        /* Back Button Styles */
+        .back-button-container {
+            margin-bottom: 20px;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateX(-3px);
+        }
+
+        .btn-back i {
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -723,6 +753,12 @@
         <!-- Authentication Section -->
         <div id="authSection">
             <div class="form">
+                <div class="back-button-container">
+                    <button class="btn-back" onclick="goBackToHome()">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                </div>
+                
                 <div class="auth-header">
                     <p>Sign in to your account or create a new one</p>
                 </div>
@@ -1169,6 +1205,16 @@
                 console.error('Error creating user account:', error);
                 return false;
             }
+        }
+        
+        function goBackToHome() {
+            console.log('Going back to home page');
+            
+            // Hide auth section
+            document.getElementById('authSection').style.display = 'none';
+            
+            // Show home page section
+            document.getElementById('homePageSection').style.display = 'block';
         }
         
         function showSignIn() {
