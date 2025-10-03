@@ -741,7 +741,7 @@
                             <span>Direct Email Reports</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="showSignIn()">
+                    <button class="btn btn-primary" onclick="openSignInPage()">
                         <i class="fas fa-rocket"></i> Get Started
                     </button>
                 </div>
@@ -1215,6 +1215,365 @@
             
             // Show home page section
             document.getElementById('homePageSection').style.display = 'block';
+        }
+        
+        function openSignInPage() {
+            console.log('Opening sign-in page in new window');
+            
+            // Create a new window with the sign-in page
+            const signInWindow = window.open('', 'signin', 'width=600,height=700,scrollbars=yes,resizable=yes');
+            
+            // Get the sign-in page HTML content
+            const authSection = document.getElementById('authSection');
+            const authHTML = authSection.innerHTML;
+            
+            // Write the sign-in page content to the new window
+            signInWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Sign In - Weight Tracking</title>
+                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            min-height: 100vh;
+                            color: #333;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px;
+                        }
+
+                        .container {
+                            max-width: 500px;
+                            width: 100%;
+                        }
+
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            color: white;
+                        }
+
+                        .header h1 {
+                            font-size: 2.5rem;
+                            margin-bottom: 10px;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                        }
+
+                        .form {
+                            background: white;
+                            border-radius: 15px;
+                            padding: 30px;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                        }
+
+                        .auth-header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+
+                        .auth-header p {
+                            color: #666;
+                            font-size: 1rem;
+                        }
+
+                        .auth-tabs {
+                            display: flex;
+                            margin-bottom: 30px;
+                            border-radius: 10px;
+                            overflow: hidden;
+                            background: #f8f9fa;
+                        }
+
+                        .tab-btn {
+                            flex: 1;
+                            padding: 15px;
+                            border: none;
+                            background: transparent;
+                            cursor: pointer;
+                            font-size: 1rem;
+                            font-weight: 500;
+                            color: #666;
+                            transition: all 0.3s ease;
+                        }
+
+                        .tab-btn.active {
+                            background: #667eea;
+                            color: white;
+                        }
+
+                        .tab-btn:hover {
+                            background: #667eea;
+                            color: white;
+                        }
+
+                        .auth-form {
+                            display: none;
+                        }
+
+                        .auth-form.active {
+                            display: block;
+                        }
+
+                        .input-group {
+                            margin-bottom: 20px;
+                        }
+
+                        .input-group label {
+                            display: block;
+                            margin-bottom: 8px;
+                            font-weight: 500;
+                            color: #555;
+                        }
+
+                        .input-group input {
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #e0e0e0;
+                            border-radius: 8px;
+                            font-size: 1rem;
+                            transition: border-color 0.3s ease;
+                        }
+
+                        .input-group input:focus {
+                            outline: none;
+                            border-color: #667eea;
+                        }
+
+                        .password-container {
+                            position: relative;
+                        }
+
+                        .password-toggle {
+                            position: absolute;
+                            right: 12px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            color: #666;
+                            font-size: 1rem;
+                        }
+
+                        .checkbox-group {
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: 20px;
+                        }
+
+                        .checkbox-group input {
+                            margin-right: 8px;
+                        }
+
+                        .checkbox-group label {
+                            font-size: 0.9rem;
+                            color: #666;
+                        }
+
+                        .btn {
+                            width: 100%;
+                            padding: 15px;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 10px;
+                            font-size: 1.1rem;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                        }
+
+                        .btn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+                        }
+
+                        .auth-footer {
+                            text-align: center;
+                            margin-top: 20px;
+                        }
+
+                        .auth-footer p {
+                            color: #666;
+                            font-size: 0.9rem;
+                        }
+
+                        .auth-footer a {
+                            color: #667eea;
+                            text-decoration: none;
+                            font-weight: 500;
+                        }
+
+                        .auth-footer a:hover {
+                            text-decoration: underline;
+                        }
+
+                        .back-button-container {
+                            margin-bottom: 20px;
+                        }
+
+                        .btn-back {
+                            background: rgba(255,255,255,0.2);
+                            color: white;
+                            border: 2px solid rgba(255,255,255,0.3);
+                            padding: 10px 20px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            font-size: 1rem;
+                            font-weight: 500;
+                            transition: all 0.3s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                        }
+
+                        .btn-back:hover {
+                            background: rgba(255,255,255,0.3);
+                            border-color: rgba(255,255,255,0.5);
+                            transform: translateX(-3px);
+                        }
+
+                        .btn-back i {
+                            font-size: 0.9rem;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1><i class="fas fa-weight"></i> Weight Tracking</h1>
+                        </div>
+                        <div class="form">
+                            ${authHTML}
+                        </div>
+                    </div>
+                    <script>
+                        // Initialize the sign-in page
+                        document.addEventListener('DOMContentLoaded', function() {
+                            console.log('Sign-in page loaded');
+                            
+                            // Set up tab switching
+                            function switchTab(tab) {
+                                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                                
+                                if (tab === 'signIn') {
+                                    document.getElementById('signInTab').classList.add('active');
+                                    document.getElementById('signInForm').classList.add('active');
+                                } else {
+                                    document.getElementById('signUpTab').classList.add('active');
+                                    document.getElementById('signUpForm').classList.add('active');
+                                }
+                            }
+                            
+                            // Set up password toggles
+                            function togglePassword(inputId) {
+                                const input = document.getElementById(inputId);
+                                const icon = document.getElementById(inputId + 'Icon');
+                                
+                                if (input.type === 'password') {
+                                    input.type = 'text';
+                                    icon.classList.remove('fa-eye');
+                                    icon.classList.add('fa-eye-slash');
+                                } else {
+                                    input.type = 'password';
+                                    icon.classList.remove('fa-eye-slash');
+                                    icon.classList.add('fa-eye');
+                                }
+                            }
+                            
+                            // Set up login function
+                            function performLogin() {
+                                const email = document.getElementById('loginEmail').value;
+                                const password = document.getElementById('loginPassword').value;
+                                
+                                if (!email || !password) {
+                                    alert('Please fill in all fields');
+                                    return;
+                                }
+                                
+                                // Simple demo login
+                                if ((email === 'admin' && password === 'HealthTrack2024!') || 
+                                    (email === 'user' && password === 'WeightLoss123!')) {
+                                    alert('Login successful! Redirecting to main app...');
+                                    // Close this window and open main app in parent
+                                    window.opener.showMainApp();
+                                    window.close();
+                                } else {
+                                    alert('Invalid credentials. Demo accounts:\\n\\nEmail: admin\\nPassword: HealthTrack2024!\\n\\nOr\\n\\nEmail: user\\nPassword: WeightLoss123!');
+                                }
+                            }
+                            
+                            function performSignup() {
+                                const name = document.getElementById('signupName').value;
+                                const email = document.getElementById('signupEmail').value;
+                                const password = document.getElementById('signupPassword').value;
+                                const confirmPassword = document.getElementById('signupConfirmPassword').value;
+                                const agreeTerms = document.getElementById('agreeTerms').checked;
+                                
+                                if (!name || !email || !password || !confirmPassword) {
+                                    alert('Please fill in all fields');
+                                    return;
+                                }
+                                
+                                if (password !== confirmPassword) {
+                                    alert('Passwords do not match');
+                                    return;
+                                }
+                                
+                                if (!agreeTerms) {
+                                    alert('Please agree to the Terms of Service and Privacy Policy');
+                                    return;
+                                }
+                                
+                                alert('Account created successfully! You can now sign in.');
+                                switchTab('signIn');
+                            }
+                            
+                            function showForgotPassword() {
+                                alert('Password reset functionality would be implemented here. For demo purposes, use:\\n\\nEmail: admin\\nPassword: HealthTrack2024!\\n\\nOr\\n\\nEmail: user\\nPassword: WeightLoss123!');
+                            }
+                            
+                            function showTerms() {
+                                alert('Terms of Service:\\n\\n1. Use this application responsibly\\n2. Keep your health data secure\\n3. Consult healthcare professionals for medical advice\\n4. We respect your privacy and data');
+                            }
+                            
+                            function showPrivacy() {
+                                alert('Privacy Policy:\\n\\n1. We collect only necessary health data\\n2. Your data is encrypted and secure\\n3. We do not share your personal information\\n4. You can delete your data at any time');
+                            }
+                            
+                            function goBackToHome() {
+                                window.close();
+                            }
+                            
+                            // Make functions globally available
+                            window.switchTab = switchTab;
+                            window.togglePassword = togglePassword;
+                            window.performLogin = performLogin;
+                            window.performSignup = performSignup;
+                            window.showForgotPassword = showForgotPassword;
+                            window.showTerms = showTerms;
+                            window.showPrivacy = showPrivacy;
+                            window.goBackToHome = goBackToHome;
+                        });
+                    <\/script>
+                </body>
+                </html>
+            `);
+            
+            signInWindow.document.close();
         }
         
         function showSignIn() {
